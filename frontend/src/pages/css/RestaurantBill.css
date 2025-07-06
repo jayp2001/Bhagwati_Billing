@@ -1,0 +1,6 @@
+.first_column{
+    max-width: 40%;
+}
+.third_column,.second_column,.fourth_column{
+    max-width: 20%;
+}

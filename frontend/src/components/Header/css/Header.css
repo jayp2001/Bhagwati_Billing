@@ -1,0 +1,115 @@
+body{
+    width: 100%;
+}
+.left_header_icon{
+    font-size: 25px;
+}
+.css-1orzy9s{
+    height: 28px !important;
+}
+.css-1orzy9s{
+    margin: 0 !important;
+    border: 1px solid grey;
+}
+.css-1776fzg-MuiInputBase-root{
+    height: 24px !important;
+}
+.css-1776fzg-MuiInputBase-root .MuiInputBase-input{
+    font-size: 14px !important;
+}
+.css-i4bv87-MuiSvgIcon-root{
+    font-size: 20px !important;
+    color: grey !important;
+}
+.css-i4bv87-MuiSvgIcon-root{
+    font-size: 25px !important;
+    color: black !important;
+}
+.main_header{
+    justify-items: center;
+    align-items: center;
+}
+.MuiPaper-root.MuiPaper-elevation.MuiPaper-elevation16.MuiDrawer-paper.MuiDrawer-paperAnchorRight.css-1160xiw-MuiPaper-root-MuiDrawer-paper{
+    margin-top: 8px;
+    margin-right: 10px;
+    border-radius: 10px 10px 10px 10px;
+}
+.tabButton.active{
+    border-bottom: 4px solid rgb(198, 7, 7);
+}
+.grayColor{
+    color: rgb(91, 90, 90) !important;
+}
+
+.recentBillHeader{
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.7);
+}
+.HoldBillsIcons{
+    color: gray !important;
+    font-size: 20px !important;
+    margin-right: 5px !important;
+}
+.rupeesIcon{
+    font-size: 15px !important;
+}
+.blackBorder{
+    border-color: rgb(201 201 201);
+}
+.CustomWisthToDisableArea{
+    width: 85%;
+}
+
+.recentBillRow:hover{
+    transform: scale(1.02);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.7);
+    font-weight: 600;
+}
+
+.recentBillContainer{
+    cursor: pointer;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.recentBillRow{
+    border-bottom: 1px solid rgba(0, 0, 0, 0.7);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+.popoverSearch{
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid black;
+}
+.anotherSearch{
+    border: 1px solid black;
+    padding: 6px;
+    border-radius: 5px;
+    width: 100%;
+}
+input:focus {
+    outline: none;
+}
+.customername{
+    white-space: nowrap; 
+    width: 50%; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+}
+.PopOverWidth{
+    width: 100% !important;
+}
+.noFoundIcon{
+    font-size: 96px !important;
+}
+.customHeightRecent{
+    height: calc(100vh - 210px) !important;
+}
+.customHeightHold{
+    height: calc(100vh - 60px) !important;
+}
+
+.discardBtn{
+    border: 1px solid rgba(0, 0, 0, 0.7);
+    padding: 0px 10px 0px 10px;
+    margin-right: 10px;
+}

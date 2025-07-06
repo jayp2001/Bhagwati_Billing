@@ -1,0 +1,94 @@
+{
+  "name": "shree-bhagwati-billing",
+  "version": "1.0.0",
+  "description": "Shree Bhagwati Restaurant Billing System",
+  "main": "electron/main.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "concurrently \"npm run start:react\" \"wait-on http://localhost:3000 && electron .\"",
+    "start:react": "cd frontend && npm start",
+    "build": "cd frontend && npm run build",
+    "electron": "electron .",
+    "electron-dev": "concurrently \"npm run start:react\" \"wait-on http://localhost:3000 && electron .\"",
+    "dist": "npm run build && electron-builder",
+    "dist:win": "npm run build && electron-builder --win --x64",
+    "dist:win-portable": "npm run build && electron-builder --win portable --x64",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:linux": "npm run build && electron-builder --linux",
+    "pack": "npm run build && electron-builder --dir",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "build": {
+    "appId": "com.yourcompany.Shree Bhagwati Billing",
+    "productName": "Shree Bhagwati Billing",
+    "icon": "assets/icon.ico",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/**/*",
+      "frontend/build/**/*",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "frontend/build",
+        "to": "app"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Shree Bhagwati Billing",
+      "uninstallDisplayName": "Shree Bhagwati Billing",
+      "artifactName": "${productName}-Setup-${version}.${ext}",
+      "deleteAppDataOnUninstall": true,
+      "runAfterFinish": true,
+      "perMachine": false
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.ico"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.ico"
+    }
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "electron": "^37.2.0",
+    "electron-builder": "^25.1.6",
+    "wait-on": "^8.0.1"
+  },
+  "keywords": [
+    "electron",
+    "react",
+    "desktop",
+    "cross-platform"
+  ],
+  "author": "Shree Bhagwati",
+  "license": "MIT",
+  "dependencies": {
+    "node-machine-id": "^1.1.12"
+  }
+}

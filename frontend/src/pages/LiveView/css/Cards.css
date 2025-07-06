@@ -1,0 +1,80 @@
+body{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+.CardContent{
+    padding: 0px !important;
+}
+.css-46bh2p-MuiCardContent-root{
+    padding: 0px !important;
+}
+.itemCustomheight{
+    height: 102px;
+    overflow: auto;
+}
+.HotelHeight{
+    height: 120px;
+    overflow: auto;
+}
+.HotelDetailsHeight{
+    height: 105px !important;
+    overflow: auto !important;
+}
+.WithoutAddresHeight{
+    height: 150.6px;
+    overflow: auto;
+}
+.ItemDetails{
+    max-height: 267px;
+    overflow: auto;
+}
+.textColorIcon{
+    color: white !important;
+}
+.DeliveryColor{
+    background-color: #F0D3FF !important;
+}
+.DineInColor{
+    background-color: #DAE4D0 !important ;
+}
+.DineInColorIcon {
+    background-color: #87b658 !important;
+}
+.DeliveryColorIcon{
+    background-color: #d278ff !important;
+}
+.PickUpColor{
+    background-color: #CEEBF4 !important;
+}
+.PickUpColorIcon{
+    background-color: #4feaff !important;
+}
+.HotelColor{
+    background-color: #FFE6D1 !important;
+}
+.HotelColorIcon{
+    background-color: #ff9844 !important;
+    margin-left: 9px !important;    
+}
+.leftAuto{
+    left: 47%;
+    top: -7%;
+}
+
+.printStatus{
+    background-color: rgb(56 189 248);
+}
+.runningStatus {
+    background-color: rgb(192 38 211);
+}
+.cancelStatus {
+    background-color: rgb(220 38 38);
+}
+.completeStatus {
+    background-color: rgb(101 163 13);
+}
+.onDeliveryStatus {
+    background-color: rgb(249 115 22);
+}
+.foodReadyStatus {
+    background-color: rgb(99 102 241);
+}

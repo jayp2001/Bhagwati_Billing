@@ -1,0 +1,54 @@
+body{
+    font-size: 14px !important;
+    overflow: hidden !important;
+}
+.left_Section{
+    height: calc(100vh - 210px) !important;
+}
+.bill_tag_12{
+    height: calc(65vh - 2px) !important;
+    overflow: hidden;
+}
+.css-ivnu1y-MuiPaper-root-MuiAppBar-root{
+    color: black !important;
+}
+.right_section_1{
+    height: calc(100vh - 48px) !important;
+}
+.card_sideBar{
+    border: 4px solid rgb(46, 156, 46) !important;
+}
+.radio_buttons{
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-evenly !important;
+}
+.MuiTypography-root.MuiTypography-body1.MuiFormControlLabel-label.css-ahj2mt-MuiTypography-root{
+    font-size: 17px !important;
+}
+.main_bill2{
+    overflow: hidden !important;
+}
+.main_bill2 .bill_tag{
+    height: max-content !important;
+    display: flex;
+    justify-content: center !important;
+    align-items: center !important;
+}
+.button{
+    padding: 6px 18px 6px 18px !important;
+}
+.another_2{
+    background-color: transparent !important;
+    color: black;
+    border: 1px solid black;
+}
+.tab_view{
+    background-color: rgb(77, 77, 77);
+}
+.save_button{
+    padding: 6px 20px 6px 20px !important ;
+}
+.bill_tag.fixed_height{
+    height: calc(100vh - 348px) !important;
+}

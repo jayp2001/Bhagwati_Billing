@@ -1,0 +1,48 @@
+.css-nr7401-MuiTable-root tr>*:not(:first-child) {
+    text-align: left !important;
+}
+.table_Actions_icon2:hover .table_icon2{
+    color: white !important;
+}
+
+.textFields .css-1t8l2tu-MuiInputBase-input-MuiOutlinedInput-input {
+    padding: 16.5px 14px 16.5px 14px !important;
+}
+.tableHead{
+    background-color: #d5d5d5 !important;
+}
+.headerCentertext{
+    padding-left: 50px !important;
+}
+.margins{
+    padding-left: 23px !important;
+}
+.addCategorySaveBtn {
+    height: 50px;
+    width: 100%;
+    padding: 5px 15px;
+    text-align: center;
+    border-radius: 5px;
+    background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(0, 122, 255, 1) 0%, rgba(0, 156, 255, 1) 78%);
+    color: #fff;
+}
+
+.addCategorySaveBtn:hover {
+    transform: scale(1.011);
+    box-shadow: 0 3px 9px 0 rgba(0, 0, 0, 0.15);
+}
+
+.addCategoryCancleBtn {
+    height: 50px;
+    width: 100%;
+    padding: 5px 15px;
+    text-align: center;
+    border-radius: 5px;
+    color: #fff;
+    background: linear-gradient(195deg, #42424a, #191919);
+}
+
+.addCategoryCancleBtn:hover {
+    transform: scale(1.011);
+    box-shadow: 0 3px 9px 0 rgba(0, 0, 0, 0.15);
+}

@@ -1,0 +1,22 @@
+
+.main_bill{
+    width: 301.95px;
+    height: min-content;
+}
+.bill_hr{
+    border: 1px dashed black;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.third_column,.second_column{
+    max-width: 20%;
+}
+.first_column{
+    max-width: 60%;
+}
+.upper_right{
+    max-width: 75%;
+}
+.upper_left{
+    max-width: 25%;
+}
