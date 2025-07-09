@@ -327,6 +327,8 @@ function Dashboard() {
             accountId: dueFormData.accountId,
             dueNote: dueFormData.dueNote,
             isOfficial: billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false,
+            upiJson: upiJson,
+            onlineId: upiId,
             billStatus: 'complete'
         };
         await axios

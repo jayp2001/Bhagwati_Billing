@@ -3,7 +3,7 @@ const path = require('path');
 const { exec } = require('child_process');
 const os = require('os');
 const { machineIdSync } = require('node-machine-id');
-const isDev = process.env.NODE_ENV === 'development';
+const isDev = true;
 
 let mainWindow;
 

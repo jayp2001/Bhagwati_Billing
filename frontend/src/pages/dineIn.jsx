@@ -3408,7 +3408,13 @@ const DineIn = () => {
                                                                     }><DeleteOutlineIcon fontSize="small" style={{ fill: "#FFFFFF" }} /></button>
                                                                 </div>}
                                                         </div>
-                                                        <hr style={{ border: '0.5px solid rgba(0,0,0,0.5)' }} className="mt-4" />
+                                                        <hr style={{ border: '0.5px solid rgba(0,0,0,0.5)' }} className="mb-2 mt-4" />
+                                                        <div className="flex gap-4">
+                                                            <div style={{ fontSize: "14px" }}>
+                                                                Captain: {data.captain}
+                                                            </div>
+                                                        </div>
+                                                        <hr style={{ border: '0.5px solid rgba(0,0,0,0.5)' }} className="mt-2" />
                                                         <div className="grid grid-cols-12 gap-4 mt-2">
                                                             <div className="col-span-8">
                                                                 Items
@@ -3429,12 +3435,23 @@ const DineIn = () => {
                                                                             {item.qty + ' ' + item.unit}
                                                                         </div>
                                                                     </div>
+                                                                    {item.comment && <div style={{ fontSize: '14px' }}> Note: {item.comment}</div>}
                                                                     {((index + 1) != data?.items?.length) &&
                                                                         < hr className="mt-2" style={{ border: '0.5px solid rgba(0, 0, 0, 0.2)' }} />
                                                                     }
                                                                 </>
                                                             ))
                                                         }
+                                                        {data.tokenComment && <>
+                                                            <hr className="mt-2 mb-2" style={{ border: '0.5px solid rgba(0, 0, 0, 0.5)' }} />
+                                                            <div className="flex gap-4">
+                                                                <div style={{ fontSize: "14px" }}>
+                                                                    Note: {data.tokenComment}
+                                                                </div>
+                                                            </div>
+                                                        </>
+                                                        }
+
                                                     </div>
                                                 ))
                                                 }
