@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import PersonIcon from '@mui/icons-material/Person';
 import CheckIcon from '@mui/icons-material/Check';
 import EditIcon from '@mui/icons-material/Edit';
 // import { useNavigate } from "react-router-dom";
@@ -309,7 +310,7 @@ const DineIn = () => {
             .then((res) => {
                 setSubKotList(res.data);
                 if (res.data.length > 0) {
-                    setCaptain(res.data[0].captain)
+                    setCaptain(res.data[0].assignCaptain)
                 }
             })
             .catch((error) => {
@@ -3410,8 +3411,9 @@ const DineIn = () => {
                                                         </div>
                                                         <hr style={{ border: '0.5px solid rgba(0,0,0,0.5)' }} className="mb-2 mt-4" />
                                                         <div className="flex gap-4">
-                                                            <div style={{ fontSize: "14px" }}>
-                                                                Captain: {data.captain}
+                                                            <div className="flex items-center gap-2 text-sm">
+                                                                <PersonIcon />
+                                                                <span>{data.captain}</span>
                                                             </div>
                                                         </div>
                                                         <hr style={{ border: '0.5px solid rgba(0,0,0,0.5)' }} className="mt-2" />

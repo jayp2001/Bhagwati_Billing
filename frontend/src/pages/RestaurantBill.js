@@ -561,7 +561,10 @@ const RestaurantBill = (props) => {
                     >
                       Scan To Pay
                     </td>
-                  </tr></> : <></>
+                  </tr></> :
+                  <>
+
+                  </>
               }
               {props?.data?.footerBill &&
                 <tr>
@@ -597,7 +600,7 @@ const RestaurantBill = (props) => {
           </table>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

@@ -400,8 +400,10 @@ const Header = (props) => {
     "Cancel": 'bg-red-300',
     "On Delivery": 'bg-orange-300',
     "Food Ready": "bg-sky-300",
-    "Print": 'bg-green-300',
-    "complete": "bg-neutral-200"
+    "Print": 'bg-yellow-300',
+    "complete": "bg-neutral-200",
+    "CancelToken": "bg-pink-200",
+    "complete": "bg-green-100"
   };
 
   const filteredBills = recentBill.filter((val) =>

@@ -29,6 +29,7 @@ import TableBarIcon from '@mui/icons-material/TableBar';
 import ClearIcon from '@mui/icons-material/Clear';
 import { pad } from 'crypto-js';
 import { TbBorderRadius } from 'react-icons/tb';
+import DineInBill from '../dineInBill';
 // Use the exposed ipcRenderer from preload script
 const ipcRenderer = window.ipcRenderer;
 const style = {
@@ -373,7 +374,7 @@ function Dashboard() {
                 setLoading(false);
                 getTableList();
                 try {
-                    const pickupKotPrint = renderToString(<TokenBil data={res.data} />);
+                    const pickupKotPrint = renderToString(<DineInBill data={res.data} />);
                     const printerDataKot = {
                         printer: dineinbill[0],
                         data: pickupKotPrint,

@@ -111,7 +111,7 @@ ipcMain.on("findPrinter", async (event, title) => {
 ipcMain.on("set-title", async (event, title) => {
     const printer = title.printer;
     const data = title.data;
-    const printWindow = new BrowserWindow({ show: false });
+    const printWindow = new BrowserWindow({ show: true });
     await printWindow.loadURL(`data:text/html,` + encodeURIComponent(data));
     try {
         printWindow.webContents.print({

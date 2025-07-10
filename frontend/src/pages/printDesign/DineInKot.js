@@ -30,7 +30,7 @@ const KOTDineIn = (props) => {
           borderBottom: props.data.billComment ? "1px solid black" : "0px",
         }}
       >
-        {(props.isEdit || props.isDelete) &&
+        {(props.isEdit || props.isDelete || props.data.isEdit || props.data.isDelete) &&
           <div
             style={{
               padding: "10px 0px 10px 0px",
@@ -41,9 +41,9 @@ const KOTDineIn = (props) => {
               style={{ fontWeight: "bold", fontSize: "16px", }}
             >
               <meta charSet="utf-8" />
-              {props.isEdit ? "Modified" : ""}
+              {props.isEdit || props.data.isEdit ? "Modified" : ""}
               {
-                props.isDelete ? "Cancelled" : ""
+                props.isDelete || props.data.isDelete ? "Cancelled" : ""
               }
             </div>
           </div>
@@ -90,7 +90,7 @@ const KOTDineIn = (props) => {
               <div style={{ textAlign: "start", marginTop: "6px" }}>
                 <div>
                   KOT No{" "}
-                  <span style={{ fontSize: "16px", fontWeight: "700" }}>
+                  <span style={{ fontSize: "14px", fontWeight: "600" }}>
                     {props.data.tokenNo}
                   </span>
                 </div>
