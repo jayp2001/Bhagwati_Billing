@@ -43,6 +43,7 @@ import InputBase from "@mui/material/InputBase";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import PercentIcon from "@mui/icons-material/Percent";
 import BlockIcon from "@mui/icons-material/Block";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import KOT from "./KOT";
 import RestaurantBill from "./RestaurantBill";
 import Chip from "@mui/material/Chip";
@@ -288,6 +289,24 @@ const PickUp = () => {
   const [suggestionSelectedValue, setSuggestionSelectedValue] = useState("");
   const [inputValue, setInputValue] = useState("");
   const suggestionListRef = useRef(null);
+
+  const resetCustomerDetails = () => {
+    setCustomerData({
+      customerId: "",
+      addressId: "",
+      mobileNo: "",
+      customerName: "",
+      address: "",
+      locality: "",
+      birthDate: "",
+      aniversaryDate: "",
+    });
+    setCustomerList([]);
+    setSuggestionIndex(0);
+    setSuggestionSelectedValue("");
+    setInputValue("");
+  };
+
   const handleInputCodeChange = (e) => {
     const value = e.target.value;
     setFullFormData((prevState) => ({
@@ -4112,7 +4131,7 @@ const PickUp = () => {
   //     "mobileNo": "9825118883",
   //     "addressId": "addressId_1716211451870",
   //     "address": "અસદસદ ",
-  //     "locality": "અડદ "
+  //     "locality": "અડદ "
   //   }
   // ];
 
@@ -5075,52 +5094,48 @@ const PickUp = () => {
                           <tr className="mb-3">
                             <td className="w-5">Mobile&nbsp;</td>
                             <td className="autocompleteTxt">
-                              <input
-                                type="text"
-                                className={`border-2 w-48 p-1 rounded-sm mobileNo relative ${billError.mobileNo ? "mobileNoError" : ""
-                                  }`}
-                                name="mobileNo"
-                                // value={customerData.mobileNo}
-                                // onChange={(e) => {
-                                //   setCustomerData((perv) => ({
-                                //     ...perv,
-                                //     mobileNo: e.target.value,
-                                //   }));
-                                //   // handleOpenSuggestion(e.target.value);
-                                // }}
-                                // list="suggestion"
-                                id="searchWord"
-                                label="Outlined"
-                                variant="outlined"
-                                onChange={(e) => {
-                                  // handleFilter(e.target.value);
-                                  setBillError({
-                                    ...billError,
-                                    mobileNo: false,
-                                  });
-                                  if ((regexMobile.test(e.target.value) || e.target.value == '') && e.target.value.length < 11) {
-                                    setCustomerData((perv) => ({
-                                      ...perv,
-                                      mobileNo: e.target.value,
-                                      customerId: "",
-                                      addressId: "",
-                                    }));
-                                    setSuggestionIndex(0);
-                                    debounceFunction();
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  className={`border-2 w-48 p-1 rounded-sm mobileNo relative ${billError.mobileNo ? "mobileNoError" : ""}`}
+                                  name="mobileNo"
+                                  id="searchWord"
+                                  label="Outlined"
+                                  variant="outlined"
+                                  onChange={(e) => {
+                                    setBillError({
+                                      ...billError,
+                                      mobileNo: false,
+                                    });
+                                    if ((regexMobile.test(e.target.value) || e.target.value == '') && e.target.value.length < 11) {
+                                      setCustomerData((perv) => ({
+                                        ...perv,
+                                        mobileNo: e.target.value,
+                                        customerId: "",
+                                        addressId: "",
+                                      }));
+                                      setSuggestionIndex(0);
+                                      debounceFunction();
+                                    }
+                                  }}
+                                  onBlur={handleBlur}
+                                  onKeyDown={handleKeyDown}
+                                  value={
+                                    customerData && customerData.mobileNo
+                                      ? customerData.mobileNo
+                                      : ""
                                   }
-                                  // setInputValue(e.target.value)
-                                }}
-                                onBlur={handleBlur}
-                                onKeyDown={handleKeyDown}
-                                value={
-                                  customerData && customerData.mobileNo
-                                    ? customerData.mobileNo
-                                    : ""
-                                }
-                                autoComplete="off"
-
-                              // onBlur={() => setopenSuggestions(false)}
-                              />
+                                  autoComplete="off"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={resetCustomerDetails}
+                                  className="p-1 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors flex items-center justify-center"
+                                  title="Reset Customer Details"
+                                >
+                                  <Close fontSize="small" style={{ color: '#666' }} />
+                                </button>
+                              </div>
                               {customerList.length > 0 && (
                                 <div
                                   className="suggestions"
@@ -5376,84 +5391,49 @@ const PickUp = () => {
                             <tr className="mb-3">
                               <td className="w-5">Mobile&nbsp;</td>
                               <td className="autocompleteTxt">
-                                <input
-                                  type="text"
-                                  className={`border-2 w-48 p-1 rounded-sm mobileNo relative ${billError.mobileNo ? "mobileNoError" : ""
-                                    }`}
-                                  name="mobileNo"
-                                  // value={customerData.mobileNo}
-                                  // onChange={(e) => {
-                                  //   setCustomerData((perv) => ({
-                                  //     ...perv,
-                                  //     mobileNo: e.target.value,
-                                  //   }));
-                                  //   // handleOpenSuggestion(e.target.value);
-                                  // }}
-                                  // list="suggestion"
-                                  id="searchWord"
-                                  label="Outlined"
-                                  variant="outlined"
-                                  onChange={(e) => {
-                                    // handleFilter(e.target.value);
-                                    setBillError({
-                                      ...billError,
-                                      mobileNo: false,
-                                    });
-                                    if (
-                                      regex.test(e.target.value) &&
-                                      e.target.value.length < 11
-                                    ) {
-                                      setCustomerData((perv) => ({
-                                        ...perv,
-                                        mobileNo: e.target.value,
-                                        customerId: "",
-                                        addressId: "",
-                                      }));
-                                      // setSuggestionIndex(0);
-                                      // debounceFunction();
-                                    }
-                                    // setInputValue(e.target.value)
-                                  }}
-                                  // onBlur={handleBlur}
-                                  // onKeyDown={handleKeyDown}
-                                  value={
-                                    customerData && customerData.mobileNo
-                                      ? customerData.mobileNo
-                                      : ""
-                                  }
-                                  autoComplete="off"
-
-                                // onBlur={() => setopenSuggestions(false)}
-                                />
-                                {/* {customerList.length > 0 && (
-                                  <div
-                                    className="suggestions"
-                                    style={{
-                                      maxHeight: "165px",
-                                      overflowY: "auto",
-                                      width: "33%",
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="text"
+                                    className={`border-2 w-48 p-1 rounded-sm mobileNo relative ${billError.mobileNo ? "mobileNoError" : ""}`}
+                                    name="mobileNo"
+                                    id="searchWord"
+                                    label="Outlined"
+                                    variant="outlined"
+                                    onChange={(e) => {
+                                      setBillError({
+                                        ...billError,
+                                        mobileNo: false,
+                                      });
+                                      if ((regexMobile.test(e.target.value) || e.target.value == '') && e.target.value.length < 11) {
+                                        setCustomerData((perv) => ({
+                                          ...perv,
+                                          mobileNo: e.target.value,
+                                          customerId: "",
+                                          addressId: "",
+                                        }));
+                                        setSuggestionIndex(0);
+                                        debounceFunction();
+                                      }
                                     }}
-                                    ref={suggestionListRef}
+                                    onBlur={handleBlur}
+                                    onKeyDown={handleKeyDown}
+                                    value={
+                                      customerData && customerData.mobileNo
+                                        ? customerData.mobileNo
+                                        : ""
+                                    }
+                                    autoComplete="off"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={resetCustomerDetails}
+                                    className="p-1 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
+                                    title="Reset Customer Details"
                                   >
-                                    {customerList.map((val, index) => (
-                                      <div
-                                        key={index}
-                                        className="cursor-pointer suggestionBorder"
-                                        onClick={() => handleSuggestionClick(val)}
-                                      >
-                                        <div
-                                          className={`suggestionValue px-2 py-1 ${suggestionIndex === index
-                                            ? "bg-gray-200"
-                                            : ""
-                                            }`}
-                                        >
-                                          {val.mobileNo} - {val.customerName} -{" "}
-                                          {val.address}
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )} */}
+                                    <Close fontSize="small" style={{ color: '#666' }} />
+                                  </button>
+                                </div>
+                                {/* ... existing code ... */}
                               </td>
                             </tr>
                             <tr className="mb-3">

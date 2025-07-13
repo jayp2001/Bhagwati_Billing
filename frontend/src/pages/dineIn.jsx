@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import {
     TextField,
@@ -42,6 +41,7 @@ import InputBase from "@mui/material/InputBase";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import PercentIcon from "@mui/icons-material/Percent";
 import BlockIcon from "@mui/icons-material/Block";
+import RefreshIcon from "@mui/icons-material/Refresh";
 // import KOTDineIn from "./KOTDineIn";
 import KOTDineIn from "./printDesign/DineInKot";
 import RestaurantBill from "./RestaurantBill";
@@ -50,6 +50,8 @@ import Select from '@mui/material/Select';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 
 // import DineInBill from "./TokenBill";
 import { Switch } from "@mui/material";
@@ -228,6 +230,28 @@ const DineIn = () => {
     const suggestionListRef = useRef(null);
     const [subKotList, setSubKotList] = useState([]);
     const [useList, setUserList] = useState([]);
+    const [tabValue, setTabValue] = useState(0);
+    const handleTabChange = (event, newValue) => {
+        setTabValue(newValue);
+    };
+
+    const resetCustomerDetails = () => {
+        setCustomerData({
+            customerId: "",
+            addressId: "",
+            mobileNo: "",
+            customerName: "",
+            address: "",
+            locality: "",
+            birthDate: "",
+            aniversaryDate: "",
+        });
+        setCustomerList([]);
+        setSuggestionIndex(0);
+        setSuggestionSelectedValue("");
+        setInputValue("");
+    };
+
     const handleInputCodeChange = (e) => {
         const value = e.target.value;
         setFullFormData((prevState) => ({
@@ -481,6 +505,12 @@ const DineIn = () => {
                 setEditBillData(res.data);
                 setIsEdit(true);
                 setButtonCLicked(res?.data?.billType);
+                setUpiId(res?.data?.onlineId);
+                setDueFormData({
+                    accountId: res?.data?.payInfo?.accountId,
+                    dueNote: res?.data?.dueNote,
+                    selectedAccount: res?.data?.payInfo
+                });
                 res?.data?.billType == "Hotel" &&
                     setHotelFormData({
                         hotelId: res.data?.hotelDetails?.hotelId,
@@ -595,9 +625,9 @@ const DineIn = () => {
         if ((status == 'print' || status == 'complete' || status == 'Cancel')) {
             getBbill(billId);
         }
-        if (billId != null) {
-            getSubKotList();
-        }
+        // if (billId != null) {
+        getSubKotList();
+        // }
         // if (status == 'complete') {
         //     setIsEdit(true);
         // }
@@ -912,6 +942,7 @@ const DineIn = () => {
             itemsData: items,
             billComment: billData.billCommentAuto?.join(", "),
             isOfficial: billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false,
+            upiJson: upiJson,
             onlineId: upiId,
             tableNo: (table == 'null' || table == null) ? tempTable : table, assignCaptain: captain,
             appriciateLine: billTypeCategory["Dine In"]?.appriciateLine,
@@ -924,61 +955,65 @@ const DineIn = () => {
                 config
             )
             .then((res) => {
-                setSuccess(true);
-                setLoading(false);
-                setItems([]);
-                setFullFormData({
-                    inputCode: "",
-                    itemId: "",
-                    inputName: "",
-                    itemName: "",
-                    qty: 1,
-                    unit: "",
-                    comment: "",
-                    selectedItem: "",
-                    selectedUnit: "",
-                    itemPrice: 0,
-                    price: 0,
-                    commentAutoComplete: [],
-                });
-                setCustomerData({
-                    customerId: "",
-                    addressId: "",
-                    mobileNo: "",
-                    customerName: "",
-                    address: "",
-                    locality: "",
-                    birthDate: "",
-                    aniversaryDate: "",
-                });
-                setBillData({
-                    subTotal: 0,
-                    discountType: "none",
-                    discountValue: 0,
-                    settledAmount: "",
-                    billPayType: "cash",
-                    billComment: "",
-                    billCommentAuto: [],
-                });
-                // const pickupKotPrint = renderToString(<KOTDineIn data={res.data} />);
-                const pickupBillPrint = renderToString(
-                    res && res.data && res.data.isOfficial ? (
-                        <RestaurantBill data={res.data} />
-                    ) : (
-                        <DineInBill data={res.data} />
-                    )
-                );
-                const printerDataKot = {
-                    printer: dineinbill[0],
-                    data: pickupBillPrint,
-                };
-                if (res && res.data && res.data.printBill) {
-                    ipcRenderer.send("set-title", printerDataKot);
+                try {
+                    setSuccess(true);
+                    setLoading(false);
+                    setItems([]);
+                    setFullFormData({
+                        inputCode: "",
+                        itemId: "",
+                        inputName: "",
+                        itemName: "",
+                        qty: 1,
+                        unit: "",
+                        comment: "",
+                        selectedItem: "",
+                        selectedUnit: "",
+                        itemPrice: 0,
+                        price: 0,
+                        commentAutoComplete: [],
+                    });
+                    setCustomerData({
+                        customerId: "",
+                        addressId: "",
+                        mobileNo: "",
+                        customerName: "",
+                        address: "",
+                        locality: "",
+                        birthDate: "",
+                        aniversaryDate: "",
+                    });
+                    setBillData({
+                        subTotal: 0,
+                        discountType: "none",
+                        discountValue: 0,
+                        settledAmount: "",
+                        billPayType: "cash",
+                        billComment: "",
+                        billCommentAuto: [],
+                    });
+                    // const pickupKotPrint = renderToString(<KOTDineIn data={res.data} />);
+                    const pickupBillPrint = renderToString(
+                        res && res.data && res.data.isOfficial ? (
+                            <RestaurantBill data={res.data} />
+                        ) : (
+                            <DineInBill data={res.data} />
+                        )
+                    );
+                    const printerDataKot = {
+                        printer: dineinbill[0],
+                        data: pickupBillPrint,
+                    };
+                    if (res && res.data && res.data.printBill) {
+                        ipcRenderer.send("set-title", printerDataKot);
+                    }
+                    // setTimeout(() => {
+                    setTimeout(() => {
+                        navigate("/dashboard");
+                    }, 1500);
+                } catch (rrr) {
+                    console.log("error in addBillDataAtPrint", rrr);
                 }
-                // setTimeout(() => {
-                setTimeout(() => {
-                    navigate("/dashboard");
-                }, 1500);
                 // }, 1500)
             })
             .catch((error) => {
@@ -1242,6 +1277,7 @@ const DineIn = () => {
                     };
                     ipcRenderer.send("set-title", printerDataKot);
                 } catch (rrr) {
+                    console.log(rrr);
                 }
                 // setTimeout(() => {
                 setTimeout(() => {
@@ -2037,7 +2073,7 @@ const DineIn = () => {
             )
             .then((res) => {
                 setUpiList(res.data);
-                setUpiId(res?.data[0]?.onlineId)
+                // setUpiId(res?.data[0]?.onlineId)
             })
             .catch((error) => {
                 setError(error.response ? error.response.data : "Network Error ...!!!");
@@ -3157,200 +3193,300 @@ const DineIn = () => {
                                         </table>
                                     </div>
                                     {(status == 'print' || status == 'complete' || status == 'Cancel') &&
-                                        < div className="shadow-md bg-white rounded-md my-2 p-2">
-                                            <div className="flex justify-between mb-2">
-                                                <div className="header_toggle ml-2 grid content-center ">
-                                                    <p className="w-56">Customer Details</p>
-                                                </div>
-                                                <div className="header_toggle ml-2 grid content-center ">
+                                        <Box className="shadow-md" sx={{ borderBottom: 1, borderColor: 'divider', backgroundColor: 'white', borderRadius: '6px', marginTop: '10px' }}>
+                                            <Tabs value={tabValue} onChange={handleTabChange} aria-label="bill details tabs">
+                                                <Tab label="Customer Details" />
+                                                <Tab label="KOT List" />
+                                            </Tabs>
+                                        </Box>
+                                    }
+                                    {(status == 'print' || status == 'complete' || status == 'Cancel') &&
+                                        <>
+                                            {tabValue === 0 && (
+                                                <div className="shadow-md bg-white rounded-md my-2 p-2">
                                                     <div>
-                                                        ENG{" "}
-                                                        <Switch
-                                                            checked={isEnglish}
-                                                            onChange={() => setIsEnglish(!isEnglish)}
-                                                        />{" "}
-                                                        GUJ
+                                                        <div className="flex justify-between mb-2 mt-4">
+                                                            <div className="header_toggle ml-2 grid content-center ">
+                                                                <p className="w-56">Customer Details</p>
+                                                            </div>
+                                                            <div className="header_toggle ml-2 grid content-center ">
+                                                                <div>
+                                                                    ENG{" "}
+                                                                    <Switch
+                                                                        checked={isEnglish}
+                                                                        onChange={() => setIsEnglish(!isEnglish)}
+                                                                    />{" "}
+                                                                    GUJ
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <hr />
+                                                        <table className="my-2 h-44 w-full">
+                                                            <tbody>
+                                                                <tr className="mb-3">
+                                                                    <td className="w-5">Mobile&nbsp;</td>
+                                                                    <td className="autocompleteTxt">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <input
+                                                                                type="text"
+                                                                                className={`border-2 w-48 p-1 rounded-sm mobileNo relative ${billError.mobileNo ? "mobileNoError" : ""
+                                                                                    }`}
+                                                                                name="mobileNo"
+                                                                                id="searchWord"
+                                                                                label="Outlined"
+                                                                                variant="outlined"
+                                                                                onChange={(e) => {
+                                                                                    // handleFilter(e.target.value);
+                                                                                    setBillError({
+                                                                                        ...billError,
+                                                                                        mobileNo: false,
+                                                                                    });
+                                                                                    if ((regexMobile.test(e.target.value) || e.target.value == '') && e.target.value.length < 11) {
+                                                                                        setCustomerData((perv) => ({
+                                                                                            ...perv,
+                                                                                            mobileNo: e.target.value,
+                                                                                            customerId: "",
+                                                                                            addressId: "",
+                                                                                        }));
+                                                                                        setSuggestionIndex(0);
+                                                                                        debounceFunction();
+                                                                                    }
+                                                                                    // setInputValue(e.target.value)
+                                                                                }}
+                                                                                onBlur={handleBlur}
+                                                                                onKeyDown={handleKeyDown}
+                                                                                value={
+                                                                                    customerData && customerData.mobileNo
+                                                                                        ? customerData.mobileNo
+                                                                                        : ""
+                                                                                }
+                                                                                autoComplete="off"
+
+                                                                            // onBlur={() => setopenSuggestions(false)}
+                                                                            />
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={resetCustomerDetails}
+                                                                                className="p-1 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors flex items-center justify-center"
+                                                                                title="Reset Customer Details"
+                                                                            >
+                                                                                <Close fontSize="small" style={{ color: '#666' }} />
+                                                                            </button>
+                                                                        </div>
+                                                                        {customerList.length > 0 && (
+                                                                            <div
+                                                                                className="suggestions"
+                                                                                style={{
+                                                                                    maxHeight: "165px",
+                                                                                    overflowY: "auto",
+                                                                                    width: "33%",
+                                                                                }}
+                                                                                ref={suggestionListRef}
+                                                                            >
+                                                                                {customerList.map((val, index) => (
+                                                                                    <div
+                                                                                        key={index}
+                                                                                        className="cursor-pointer suggestionBorder"
+                                                                                        onClick={() => handleSuggestionClick(val)}
+                                                                                    >
+                                                                                        <div
+                                                                                            className={`suggestionValue px-2 py-1 ${suggestionIndex === index
+                                                                                                ? "bg-gray-200"
+                                                                                                : ""
+                                                                                                }`}
+                                                                                        >
+                                                                                            {val.mobileNo} - {val.customerName} -{" "}
+                                                                                            {val.address}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
+                                                                        )}
+                                                                    </td>
+                                                                </tr>
+                                                                <tr className="mb-3">
+                                                                    <td className="w-5">Name&nbsp;</td>
+                                                                    <td>
+                                                                        {!isEnglish ? (
+                                                                            <input
+                                                                                value={
+                                                                                    customerData && customerData.customerName
+                                                                                        ? customerData.customerName
+                                                                                        : ""
+                                                                                }
+                                                                                type="text"
+                                                                                name="customerName"
+                                                                                className="border-2 w-full p-1 rounded-sm"
+                                                                                onChange={(e) => {
+                                                                                    setCustomerData((perv) => ({
+                                                                                        ...perv,
+                                                                                        customerName: e.target.value,
+                                                                                    }));
+                                                                                }}
+                                                                            />
+                                                                        ) : (
+                                                                            <ReactTransliterate
+                                                                                value={
+                                                                                    customerData && customerData.customerName
+                                                                                        ? customerData.customerName
+                                                                                        : ""
+                                                                                }
+                                                                                className="border-2 w-full p-1 rounded-sm"
+                                                                                onChangeText={(text) => {
+                                                                                    setCustomerData((perv) => ({
+                                                                                        ...perv,
+                                                                                        customerName: text,
+                                                                                    }));
+                                                                                }}
+                                                                                lang="gu"
+                                                                            />
+                                                                        )}
+                                                                    </td>
+                                                                </tr>
+                                                                <tr className="mb-3">
+                                                                    <td className="w-5">Address&nbsp;</td>
+                                                                    <td>
+                                                                        {isEnglish ? (
+                                                                            <ReactTransliterate
+                                                                                value={customerData.address}
+                                                                                className="border-2 w-full p-1 rounded-sm"
+                                                                                onChangeText={(text) => {
+                                                                                    setCustomerData((perv) => ({
+                                                                                        ...perv,
+                                                                                        address: text,
+                                                                                        addressId: "",
+                                                                                    }));
+                                                                                }}
+                                                                                lang="gu"
+                                                                            />
+                                                                        ) : (
+                                                                            <input
+                                                                                value={customerData.address}
+                                                                                type="text"
+                                                                                className="border-2 w-full p-1 rounded-sm"
+                                                                                onChange={(e) => {
+                                                                                    setCustomerData((perv) => ({
+                                                                                        ...perv,
+                                                                                        address: e.target.value,
+                                                                                        addressId: "",
+                                                                                    }));
+                                                                                }}
+                                                                            />
+                                                                        )}
+                                                                    </td>
+                                                                </tr>
+                                                                <tr className="mb-3">
+                                                                    <td className="w-5">Locality&nbsp;</td>
+                                                                    <td>
+                                                                        {isEnglish ? (
+                                                                            <ReactTransliterate
+                                                                                value={customerData.locality}
+                                                                                className="border-2 w-full p-1 rounded-sm"
+                                                                                onChangeText={(text) => {
+                                                                                    setCustomerData((perv) => ({
+                                                                                        ...perv,
+                                                                                        locality: text,
+                                                                                    }));
+                                                                                }}
+                                                                                lang="gu"
+                                                                            />
+                                                                        ) : (
+                                                                            <input
+                                                                                value={customerData.locality}
+                                                                                type="text"
+                                                                                className="border-2 w-full p-1 rounded-sm"
+                                                                                onChange={(e) => {
+                                                                                    setCustomerData((perv) => ({
+                                                                                        ...perv,
+                                                                                        locality: e.target.value,
+                                                                                    }));
+                                                                                }}
+                                                                            />
+                                                                        )}
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <hr />
-                                            <table className="my-2 h-44 w-full">
-                                                <tbody>
-                                                    <tr className="mb-3">
-                                                        <td className="w-5">Mobile&nbsp;</td>
-                                                        <td className="autocompleteTxt">
-                                                            <input
-                                                                type="text"
-                                                                className={`border-2 w-48 p-1 rounded-sm mobileNo relative ${billError.mobileNo ? "mobileNoError" : ""
-                                                                    }`}
-                                                                name="mobileNo"
-                                                                id="searchWord"
-                                                                label="Outlined"
-                                                                variant="outlined"
-                                                                onChange={(e) => {
-                                                                    // handleFilter(e.target.value);
-                                                                    setBillError({
-                                                                        ...billError,
-                                                                        mobileNo: false,
-                                                                    });
-                                                                    if ((regexMobile.test(e.target.value) || e.target.value == '') && e.target.value.length < 11) {
-                                                                        setCustomerData((perv) => ({
-                                                                            ...perv,
-                                                                            mobileNo: e.target.value,
-                                                                            customerId: "",
-                                                                            addressId: "",
-                                                                        }));
-                                                                        setSuggestionIndex(0);
-                                                                        debounceFunction();
-                                                                    }
-                                                                    // setInputValue(e.target.value)
-                                                                }}
-                                                                onBlur={handleBlur}
-                                                                onKeyDown={handleKeyDown}
-                                                                value={
-                                                                    customerData && customerData.mobileNo
-                                                                        ? customerData.mobileNo
-                                                                        : ""
-                                                                }
-                                                                autoComplete="off"
+                                            )}
 
-                                                            // onBlur={() => setopenSuggestions(false)}
-                                                            />
-                                                            {customerList.length > 0 && (
-                                                                <div
-                                                                    className="suggestions"
-                                                                    style={{
-                                                                        maxHeight: "165px",
-                                                                        overflowY: "auto",
-                                                                        width: "33%",
-                                                                    }}
-                                                                    ref={suggestionListRef}
-                                                                >
-                                                                    {customerList.map((val, index) => (
-                                                                        <div
-                                                                            key={index}
-                                                                            className="cursor-pointer suggestionBorder"
-                                                                            onClick={() => handleSuggestionClick(val)}
-                                                                        >
-                                                                            <div
-                                                                                className={`suggestionValue px-2 py-1 ${suggestionIndex === index
-                                                                                    ? "bg-gray-200"
-                                                                                    : ""
-                                                                                    }`}
-                                                                            >
-                                                                                {val.mobileNo} - {val.customerName} -{" "}
-                                                                                {val.address}
-                                                                            </div>
-                                                                        </div>
-                                                                    ))}
+                                            {tabValue === 1 && (
+                                                <div className="mt-3">
+                                                    <div className="kotList">
+                                                        {subKotList?.map((data) => (
+                                                            <div className="shadow-md bg-white rounded-md my-2 p-2">
+                                                                <div className="flex justify-between mb-2">
+                                                                    <div className="header_toggle ml-2 grid content-center ">
+                                                                        <p className="">KOT - {data.subTokenNumber}</p>
+                                                                    </div>
+                                                                    <div>
+                                                                        {data.createTime}
+                                                                    </div>
+                                                                    {data.tokenStatus == 'cancelled' ?
+                                                                        <div className="text-red-600 font-semibold">
+                                                                            Cancelled
+                                                                        </div> :
+                                                                        <div className="flex gap-2">
+                                                                            <button className="printKotBtn" onClick={() => handlePrintKot(data)}><LocalPrintshopOutlinedIcon fontSize="small" style={{ fill: "#FFFFFF" }} /></button>
+                                                                            <button className="editKotBtn" onClick={() => handleEditSubToken(data)}><EditIcon fontSize="small" style={{ fill: "#FFFFFF" }} /></button>
+                                                                            <button className="deleteKotBtn" onClick={() =>
+                                                                                deleteKotBillData(data.subTokenId, data)
+                                                                            }><DeleteOutlineIcon fontSize="small" style={{ fill: "#FFFFFF" }} /></button>
+                                                                        </div>}
                                                                 </div>
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                    <tr className="mb-3">
-                                                        <td className="w-5">Name&nbsp;</td>
-                                                        <td>
-                                                            {!isEnglish ? (
-                                                                <input
-                                                                    value={
-                                                                        customerData && customerData.customerName
-                                                                            ? customerData.customerName
-                                                                            : ""
-                                                                    }
-                                                                    type="text"
-                                                                    name="customerName"
-                                                                    className="border-2 w-full p-1 rounded-sm"
-                                                                    onChange={(e) => {
-                                                                        setCustomerData((perv) => ({
-                                                                            ...perv,
-                                                                            customerName: e.target.value,
-                                                                        }));
-                                                                    }}
-                                                                />
-                                                            ) : (
-                                                                <ReactTransliterate
-                                                                    value={
-                                                                        customerData && customerData.customerName
-                                                                            ? customerData.customerName
-                                                                            : ""
-                                                                    }
-                                                                    className="border-2 w-full p-1 rounded-sm"
-                                                                    onChangeText={(text) => {
-                                                                        setCustomerData((perv) => ({
-                                                                            ...perv,
-                                                                            customerName: text,
-                                                                        }));
-                                                                    }}
-                                                                    lang="gu"
-                                                                />
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                    <tr className="mb-3">
-                                                        <td className="w-5">Address&nbsp;</td>
-                                                        <td>
-                                                            {isEnglish ? (
-                                                                <ReactTransliterate
-                                                                    value={customerData.address}
-                                                                    className="border-2 w-full p-1 rounded-sm"
-                                                                    onChangeText={(text) => {
-                                                                        setCustomerData((perv) => ({
-                                                                            ...perv,
-                                                                            address: text,
-                                                                            addressId: "",
-                                                                        }));
-                                                                    }}
-                                                                    lang="gu"
-                                                                />
-                                                            ) : (
-                                                                <input
-                                                                    value={customerData.address}
-                                                                    type="text"
-                                                                    className="border-2 w-full p-1 rounded-sm"
-                                                                    onChange={(e) => {
-                                                                        setCustomerData((perv) => ({
-                                                                            ...perv,
-                                                                            address: e.target.value,
-                                                                            addressId: "",
-                                                                        }));
-                                                                    }}
-                                                                />
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                    <tr className="mb-3">
-                                                        <td className="w-5">Locality&nbsp;</td>
-                                                        <td>
-                                                            {isEnglish ? (
-                                                                <ReactTransliterate
-                                                                    value={customerData.locality}
-                                                                    className="border-2 w-full p-1 rounded-sm"
-                                                                    onChangeText={(text) => {
-                                                                        setCustomerData((perv) => ({
-                                                                            ...perv,
-                                                                            locality: text,
-                                                                        }));
-                                                                    }}
-                                                                    lang="gu"
-                                                                />
-                                                            ) : (
-                                                                <input
-                                                                    value={customerData.locality}
-                                                                    type="text"
-                                                                    className="border-2 w-full p-1 rounded-sm"
-                                                                    onChange={(e) => {
-                                                                        setCustomerData((perv) => ({
-                                                                            ...perv,
-                                                                            locality: e.target.value,
-                                                                        }));
-                                                                    }}
-                                                                />
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                                                <hr style={{ border: '0.5px solid rgba(0,0,0,0.5)' }} className="mb-2 mt-4" />
+                                                                <div className="flex gap-4">
+                                                                    <div className="flex items-center gap-2 text-sm">
+                                                                        <PersonIcon />
+                                                                        <span>{data.captain}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <hr style={{ border: '0.5px solid rgba(0,0,0,0.5)' }} className="mt-2" />
+                                                                <div className="grid grid-cols-12 gap-4 mt-2">
+                                                                    <div className="col-span-8">
+                                                                        Items
+                                                                    </div>
+                                                                    <div className="col-span-4 text-end">
+                                                                        Qty
+                                                                    </div>
+                                                                </div>
+                                                                <hr className="mt-2" style={{ border: '0.5px solid rgba(0, 0, 0, 0.5)' }} />
+                                                                {
+                                                                    data.items?.map((item, index) => (
+                                                                        <>
+                                                                            <div className="grid grid-cols-12 gap-4 mt-2">
+                                                                                <div className={item.kotItemStatus == 'cancelled' ? " col-span-8 line-through" : "col-span-8"} >
+                                                                                    {(item.kotItemStatus && item.kotItemStatus != 'cancelled') && <span className="capitalize">{"[" + item.kotItemStatus + "]"}</span>} {item.itemName}
+                                                                                </div>
+                                                                                <div className={item.kotItemStatus == 'cancelled' ? "col-span-4 text-end line-through" : "col-span-4 text-end"} >
+                                                                                    {item.qty + ' ' + item.unit}
+                                                                                </div>
+                                                                            </div>
+                                                                            {item.comment && <div style={{ fontSize: '14px' }}> Note: {item.comment}</div>}
+                                                                            {((index + 1) != data?.items?.length) &&
+                                                                                < hr className="mt-2" style={{ border: '0.5px solid rgba(0, 0, 0, 0.2)' }} />
+                                                                            }
+                                                                        </>
+                                                                    ))
+                                                                }
+                                                                {data.tokenComment && <>
+                                                                    <hr className="mt-2 mb-2" style={{ border: '0.5px solid rgba(0, 0, 0, 0.5)' }} />
+                                                                    <div className="flex gap-4">
+                                                                        <div style={{ fontSize: "14px" }}>
+                                                                            Note: {data.tokenComment}
+                                                                        </div>
+                                                                    </div>
+                                                                </>
+                                                                }
+
+                                                            </div>
+                                                        ))
+                                                        }
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
                                     }
                                     {status != 'print' && status != 'complete' && status != 'Cancel' &&
                                         <>

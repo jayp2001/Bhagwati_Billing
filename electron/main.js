@@ -27,7 +27,7 @@ function createWindow() {
     // Load the app
     if (isDev) {
         // In development, load from React dev server
-        mainWindow.loadURL('http://localhost:3000');
+        mainWindow.loadURL('http://localhost:3001');
         // Open DevTools in development
         mainWindow.webContents.openDevTools();
     } else {
