@@ -3,15 +3,13 @@ const path = require('path');
 const { exec } = require('child_process');
 const os = require('os');
 const { machineIdSync } = require('node-machine-id');
-const isDev = true;
+const isDev = false;
 
 let mainWindow;
 
 function createWindow() {
     // Create the browser window - exactly like your old setup
     mainWindow = new BrowserWindow({
-        width: 1200,
-        height: 800,
         minWidth: 800,
         minHeight: 600,
         title: "Shree Bhagwati Billing",
@@ -27,7 +25,7 @@ function createWindow() {
     // Load the app
     if (isDev) {
         // In development, load from React dev server
-        mainWindow.loadURL('http://localhost:3001');
+        mainWindow.loadURL('http://localhost:3000');
         // Open DevTools in development
         mainWindow.webContents.openDevTools();
     } else {
@@ -111,7 +109,7 @@ ipcMain.on("findPrinter", async (event, title) => {
 ipcMain.on("set-title", async (event, title) => {
     const printer = title.printer;
     const data = title.data;
-    const printWindow = new BrowserWindow({ show: true });
+    const printWindow = new BrowserWindow({ show: false });
     await printWindow.loadURL(`data:text/html,` + encodeURIComponent(data));
     try {
         printWindow.webContents.print({

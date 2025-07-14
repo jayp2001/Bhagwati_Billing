@@ -324,6 +324,7 @@ const DineIn = () => {
     }
     const handleCloseO = () => {
         setItemComment();
+        if (!upiId) setUpiId(upiList[0]?.onlineId)
         setAnchorElO(null);
     };
 
@@ -942,7 +943,7 @@ const DineIn = () => {
             itemsData: items,
             billComment: billData.billCommentAuto?.join(", "),
             isOfficial: billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false,
-            upiJson: upiJson,
+            upiJson: upiJson ? upiJson : upiList[0],
             onlineId: upiId,
             tableNo: (table == 'null' || table == null) ? tempTable : table, assignCaptain: captain,
             appriciateLine: billTypeCategory["Dine In"]?.appriciateLine,
@@ -2079,6 +2080,7 @@ const DineIn = () => {
                 setError(error.response ? error.response.data : "Network Error ...!!!");
             });
     };
+
     const getComments = async () => {
         await axios
             .get(`${BACKEND_BASE_URL}billingrouter/getComment`, config)
@@ -2944,6 +2946,7 @@ const DineIn = () => {
                 setCustomerData={setCustomerData}
                 setButtonCLicked={setButtonCLicked}
                 setHotelFormData={setHotelFormData}
+                setUpiId={setUpiId}
             />
             <section className="right_section ">
                 <div className="right_top_header gap-6 p-2 flex paddinAnother w-full">
@@ -4209,7 +4212,7 @@ const DineIn = () => {
                             <Select
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
-                                value={upiId}
+                                value={upiId ? upiId : upiList[0]?.onlineId}
                                 label="UPI id"
                                 defaultValue={upiList[0]?.onlineId}
                                 onChange={(e) => setUpiId(e.target.value)}
