@@ -112,7 +112,10 @@ const Header = (props) => {
       )
       .then((res) => {
         // console.log('path', location.pathname.split("/"))
-        if (location.pathname.split("/")[1] != 'main' && location.pathname.split("/")[2] != 'DineIn') {
+        if ((location.pathname.split("/")[1] == 'main' && location.pathname.split("/")[2] == 'DineIn') && res.data.billType != 'Dine In') {
+          navigate(`/main/${res.data.billType}/${id}`)
+        }
+        else if (location.pathname.split("/")[1] != 'main' && location.pathname.split("/")[2] != 'DineIn') {
           res.data.billType == 'Dine In' ? navigate(`/main/DineIn/${res.data.tableInfo.tableNo}/${res.data.billId}/${res.data.billStatus}`) : navigate(`/main/${res.data.billType}/${id}`)
           toggleDrawer("right", false);
           setOpenHold(false);
@@ -338,8 +341,8 @@ const Header = (props) => {
     ) {
       return;
     }
-    getRecentToken(location.pathname.split("/")[2] ? location.pathname.split("/")[2] == 'Pick%20Up' || location.pathname.split("/")[2] == 'Pick Up' ? "Pick Up" : location.pathname.split("/")[2] : 'Pick Up');
-    setActiveTab(location.pathname.split("/")[2] ? location.pathname.split("/")[2] == 'Pick%20Up' || location.pathname.split("/")[2] == 'Pick Up' ? "Pick Up" : location.pathname.split("/")[2] : 'Pick Up');
+    getRecentToken(location.pathname.split("/")[2] == 'DineIn' ? 'Dine In' : location.pathname.split("/")[2] ? location.pathname.split("/")[2] == 'Pick%20Up' || location.pathname.split("/")[2] == 'Pick Up' ? "Pick Up" : location.pathname.split("/")[2] : 'Pick Up');
+    setActiveTab(location.pathname.split("/")[2] == 'DineIn' ? 'Dine In' : location.pathname.split("/")[2] ? location.pathname.split("/")[2] == 'Pick%20Up' || location.pathname.split("/")[2] == 'Pick Up' ? "Pick Up" : location.pathname.split("/")[2] : 'Pick Up');
     setState({ ...state, [anchor]: open });
     // }
   };

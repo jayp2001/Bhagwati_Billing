@@ -26,7 +26,7 @@ body {
   height: calc(100vh - 117px) !important;
 }
 .right_meun {
-  height: calc(100vh - 150px) !important;
+  height: calc(100vh - 130px) !important;
 }
 
 .right_meun_T {
@@ -293,10 +293,16 @@ input[type="number"] {
 }
 
 .kotList {
-  max-height: calc(100vh - 320px);
+  max-height: calc(100vh - 365px);
   overflow: scroll;
   /* scroll-behavior: smooth; */
 }
+.kotListPrinted {
+  max-height: calc(100vh - 340px);
+  overflow: scroll;
+  /* scroll-behavior: smooth; */
+}
+
 .kotList::-webkit-scrollbar {
   display: none !important;
 }

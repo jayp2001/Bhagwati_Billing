@@ -3416,7 +3416,7 @@ const DineIn = () => {
 
                                             {tabValue === 1 && (
                                                 <div className="mt-3">
-                                                    <div className="kotList">
+                                                    <div className={status == 'print' || status == 'complete' || status == 'Cancel' ? "kotListPrinted" : "kotList"}>
                                                         {subKotList?.map((data) => (
                                                             <div className="shadow-md bg-white rounded-md my-2 p-2">
                                                                 <div className="flex justify-between mb-2">
@@ -3430,13 +3430,21 @@ const DineIn = () => {
                                                                         <div className="text-red-600 font-semibold">
                                                                             Cancelled
                                                                         </div> :
-                                                                        <div className="flex gap-2">
-                                                                            <button className="printKotBtn" onClick={() => handlePrintKot(data)}><LocalPrintshopOutlinedIcon fontSize="small" style={{ fill: "#FFFFFF" }} /></button>
-                                                                            <button className="editKotBtn" onClick={() => handleEditSubToken(data)}><EditIcon fontSize="small" style={{ fill: "#FFFFFF" }} /></button>
-                                                                            <button className="deleteKotBtn" onClick={() =>
-                                                                                deleteKotBillData(data.subTokenId, data)
-                                                                            }><DeleteOutlineIcon fontSize="small" style={{ fill: "#FFFFFF" }} /></button>
-                                                                        </div>}
+                                                                        data.tokenStatus == 'print' ?
+                                                                            <div className="text-green-600 font-semibold">
+                                                                                Printed
+                                                                            </div> :
+                                                                            data.tokenStatus == 'complete' ?
+                                                                                <div className="text-green-600 font-semibold">
+                                                                                    Completed
+                                                                                </div> :
+                                                                                <div className="flex gap-2">
+                                                                                    <button className="printKotBtn" onClick={() => handlePrintKot(data)}><LocalPrintshopOutlinedIcon fontSize="small" style={{ fill: "#FFFFFF" }} /></button>
+                                                                                    <button className="editKotBtn" onClick={() => handleEditSubToken(data)}><EditIcon fontSize="small" style={{ fill: "#FFFFFF" }} /></button>
+                                                                                    <button className="deleteKotBtn" onClick={() =>
+                                                                                        deleteKotBillData(data.subTokenId, data)
+                                                                                    }><DeleteOutlineIcon fontSize="small" style={{ fill: "#FFFFFF" }} /></button>
+                                                                                </div>}
                                                                 </div>
                                                                 <hr style={{ border: '0.5px solid rgba(0,0,0,0.5)' }} className="mb-2 mt-4" />
                                                                 <div className="flex gap-4">
