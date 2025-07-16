@@ -10,8 +10,8 @@ let mainWindow;
 function createWindow() {
     // Create the browser window - exactly like your old setup
     mainWindow = new BrowserWindow({
-        minWidth: 800,
-        minHeight: 600,
+        minWidth: 1024,
+        minHeight: 800,
         title: "Shree Bhagwati Billing",
         icon: path.join(__dirname, '../assets/icon.ico'),
         webPreferences: {

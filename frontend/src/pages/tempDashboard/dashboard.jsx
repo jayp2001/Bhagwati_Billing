@@ -158,9 +158,29 @@ function Dashboard() {
             setError(error.response?.data?.message || "Failed to cancel table");
         }
     }
-    const handleSettel = (data) => {
-        setBillData(
-            {
+    const handleSettel = async (data) => {
+        try {
+            // Get bill data by ID
+            const response = await axios.get(
+                `${BACKEND_BASE_URL}billingrouter/getBillDataById?billId=${data.billId}`,
+                config
+            );
+            const resData = response.data;
+
+            // Set UPI and due form data from API response (like PickUp.jsx)
+            setUpiId(resData?.onlineId);
+            setDueFormData((prev) => ({
+                ...prev,
+                accountId: resData?.payInfo?.accountId || '',
+                dueNote: resData?.dueNote || '',
+                selectedAccount: resData?.payInfo || '',
+            }));
+
+            // Find upiJson from upiList and upiId
+            const upiJson = upiList?.find((u) => u.onlineId === (resData?.onlineId || upiId));
+
+            // Set bill data with the response data and always include upi/account info
+            setBillData({
                 billId: data.billId,
                 tableNo: data.tableNo,
                 billPayType: 'cash',
@@ -169,10 +189,34 @@ function Dashboard() {
                 discountType: 'none',
                 discountValue: 0,
                 totalDiscount: 0,
-                billStatus: 'complete'
-            }
-        )
-        setOpen(true)
+                billStatus: 'complete',
+                ...resData,
+                upiJson: upiJson,
+                onlineId: resData?.onlineId || upiId,
+                accountId: resData?.payInfo?.accountId || dueFormData.accountId,
+                dueNote: resData?.dueNote || dueFormData.dueNote,
+            });
+            setOpen(true);
+        } catch (error) {
+            console.error('Error fetching bill data:', error);
+            // Fallback to original behavior if API fails
+            setBillData({
+                billId: data.billId,
+                tableNo: data.tableNo,
+                billPayType: 'cash',
+                subTotal: data.billAmt,
+                settledAmount: data.billAmt,
+                discountType: 'none',
+                discountValue: 0,
+                totalDiscount: 0,
+                billStatus: 'complete',
+                upiJson: upiList?.find((u) => u.onlineId === upiId),
+                onlineId: upiId,
+                accountId: dueFormData.accountId,
+                dueNote: dueFormData.dueNote,
+            });
+            setOpen(true);
+        }
     }
     const getTableList = async () => {
         await axios

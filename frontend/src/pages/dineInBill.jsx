@@ -308,7 +308,7 @@ const DineInBill = (props) => {
                                             width: "60%",
                                             padding: "8px 4px 8px 4px",
                                             textAlign: "start",
-                                            fontSize: "12px",
+                                            fontSize: "14px",
                                         }}
                                     >
                                         {item.itemName} ({item.unit}) <br />
@@ -501,7 +501,7 @@ const DineInBill = (props) => {
                                             Scan To Pay
                                         </td>
                                     </tr></> : <>
-                                    <tr style={{ width: '100%' }}>
+                                    {/* <tr style={{ width: '100%' }}>
                                         <td
                                             colSpan="6"
                                             align="center"
@@ -533,7 +533,8 @@ const DineInBill = (props) => {
                                         >
                                             Scan To Pay
                                         </td>
-                                    </tr></>
+                                    </tr> */}
+                                </>
                             }
                             {props?.data?.footerBill &&
                                 <tr>
