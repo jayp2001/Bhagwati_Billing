@@ -302,7 +302,9 @@ input[type="number"] {
   overflow: scroll;
   /* scroll-behavior: smooth; */
 }
-
+.kotListPrinted::-webkit-scrollbar {
+  display: none !important;
+}
 .kotList::-webkit-scrollbar {
   display: none !important;
 }

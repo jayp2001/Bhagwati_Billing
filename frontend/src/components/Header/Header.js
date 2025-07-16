@@ -849,11 +849,11 @@ const Header = (props) => {
                 value={search}
               />
             </div>
-            <div className="header_toggle ml-2 grid content-center ">
+            {/* <div className="header_toggle ml-2 grid content-center ">
               <div>
                 OFF <Switch checked={isSwitchOn} onChange={handleToggle} /> ON
               </div>
-            </div>
+            </div> */}
           </div>
           <div className="flex h-full align-middle gap-6 mr-3">
             <Tooltip
