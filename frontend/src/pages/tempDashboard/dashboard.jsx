@@ -168,7 +168,7 @@ function Dashboard() {
             const resData = response.data;
 
             // Set UPI and due form data from API response (like PickUp.jsx)
-            setUpiId(resData?.onlineId);
+            setUpiId(resData?.onlineId ? resData?.onlineId : upiId);
             setDueFormData((prev) => ({
                 ...prev,
                 accountId: resData?.payInfo?.accountId || '',
@@ -966,7 +966,7 @@ function Dashboard() {
                             <Select
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
-                                value={upiId}
+                                value={upiId ? upiId : upiList[0]?.onlineId}
                                 label="UPI id"
                                 defaultValue={upiList[0]?.onlineId}
                                 onChange={(e) => setUpiId(e.target.value)}

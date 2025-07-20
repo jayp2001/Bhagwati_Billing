@@ -3,7 +3,7 @@ const path = require('path');
 const { exec } = require('child_process');
 const os = require('os');
 const { machineIdSync } = require('node-machine-id');
-const isDev = false;
+const isDev = true;
 
 let mainWindow;
 
@@ -25,7 +25,7 @@ function createWindow() {
     // Load the app
     if (isDev) {
         // In development, load from React dev server
-        mainWindow.loadURL('http://localhost:3001');
+        mainWindow.loadURL('http://localhost:3000');
         // Open DevTools in development
         mainWindow.webContents.openDevTools();
     } else {
