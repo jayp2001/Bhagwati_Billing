@@ -3,7 +3,7 @@ const path = require('path');
 const { exec } = require('child_process');
 const os = require('os');
 const { machineIdSync } = require('node-machine-id');
-const isDev = true;
+const isDev = false;
 
 let mainWindow;
 
@@ -107,24 +107,27 @@ ipcMain.on("findPrinter", async (event, title) => {
 });
 
 ipcMain.on("set-title", async (event, title) => {
+    console.log("set-title", title);
     const printer = title.printer;
     const data = title.data;
     const printWindow = new BrowserWindow({ show: false });
     await printWindow.loadURL(`data:text/html,` + encodeURIComponent(data));
+    console.log("printWindow", title.printer);
     try {
         printWindow.webContents.print({
             silent: true,
             printBackground: true,
             margins: {
                 marginType: "custom",
-                top: printer.marginTop,
-                bottom: printer.marginBottom,
-                left: printer.marginLeft,
-                right: printer.marginRight,
+                top: printer?.marginTop || 0,
+                bottom: printer?.marginBottom || 0,
+                left: printer?.marginLeft || 0,
+                right: printer?.marginRight || 0,
             },
-            deviceName: printer.printerName,
+            deviceName: printer?.printerName || "",
         });
     } catch (error) {
+        console.log("error", error);
     }
 });
 
