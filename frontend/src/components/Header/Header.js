@@ -401,12 +401,12 @@ const Header = (props) => {
   }
   const statusColors = {
     "Cancel": 'bg-red-300',
-    "On Delivery": 'bg-orange-300',
-    "Food Ready": "bg-sky-300",
-    "Print": 'bg-yellow-300',
-    "complete": "bg-neutral-200",
+    "On Delivery": 'bg-white',
+    "Food Ready": "bg-white",
+    "Print": 'bg-white',
+    "complete": "bg-white",
     "CancelToken": "bg-pink-200",
-    "complete": "bg-green-100"
+    "complete": "bg-white"
   };
 
   const filteredBills = recentBill.filter((val) =>
@@ -414,7 +414,7 @@ const Header = (props) => {
   );
   const list = (anchor) => (
     <Box
-      sx={{ width: anchor === "top" || anchor === "bottom" ? "auto" : 500 }}
+      sx={{ width: anchor === "top" || anchor === "bottom" ? "auto" : 550 }}
       role="presentation"
     // onClick={toggleDrawer(anchor, false)}
     >
@@ -520,11 +520,11 @@ const Header = (props) => {
                 getBbill(data.billId);
               }}
             >
-              <div className="pl-6">{data.tokenNo}</div>
+              <div className="pl-6">{data.tokenNo} {"(" + data.billPayType + ")"}</div>
               {/* {activeTab === "Delivery" || activeTab === "Hotel" || activeTab === 'Dine In' ? ( */}
               <Tooltip title={data?.info} arrow>
                 <div
-                  className="customername ml-14"
+                  className="customername ml-8"
                   style={{ textAlign: 'center' }}
                 // onMouseEnter={(event) => handlePopoverOpen(event, data)}
                 // onMouseLeave={handlePopoverClose}

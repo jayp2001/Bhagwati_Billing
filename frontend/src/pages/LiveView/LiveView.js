@@ -368,7 +368,7 @@ const LiveView = () => {
               <div className="header_search flex ml-2 gap-2 items-center">
                 <input
                   type="search"
-                  placeholder="Enter Order no."
+                  placeholder="Search...."
                   value={searchInputValue}
                   onChange={handleSearchChange}
                   className="popoverSearch"
