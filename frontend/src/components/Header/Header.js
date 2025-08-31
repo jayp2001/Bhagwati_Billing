@@ -1,4 +1,4 @@
-import React, { useState, useEffect, act } from "react";
+import React, { useState, useEffect, act, useRef } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import Button from "../Button/Button1";
 import { styled, alpha } from "@mui/material/styles";
@@ -46,6 +46,9 @@ const Header = (props) => {
   const [adminPasswordModal, setAdminPasswordModal] = useState(false);
   const [adminPassword, setAdminPassword] = useState("");
   const [adminPcId, setAdminPcId] = useState('');
+  const [tablePasswordModal, setTablePasswordModal] = useState(false);
+  const [tablePassword, setTablePassword] = useState("");
+  const tablePasswordInputRef = useRef(null);
   const macAddress = localStorage.getItem("macAddress");
 
   const handlePopoverOpen = (event, data) => {
@@ -400,7 +403,7 @@ const Header = (props) => {
     setError(false);
   }
   const statusColors = {
-    "Cancel": 'bg-red-300',
+    "Cancel": 'bg-red-200',
     "On Delivery": 'bg-white',
     "Food Ready": "bg-white",
     "Print": 'bg-white',
@@ -414,7 +417,7 @@ const Header = (props) => {
   );
   const list = (anchor) => (
     <Box
-      sx={{ width: anchor === "top" || anchor === "bottom" ? "auto" : 550 }}
+      sx={{ width: anchor === "top" || anchor === "bottom" ? "auto" : 660 }}
       role="presentation"
     // onClick={toggleDrawer(anchor, false)}
     >
@@ -520,7 +523,7 @@ const Header = (props) => {
                 getBbill(data.billId);
               }}
             >
-              <div className="pl-6">{data.tokenNo} {"(" + data.billPayType + ")"}</div>
+              <div className="pl-6 capitalize">{data.tokenNo} {"(" + data.billPayType + ")"}</div>
               {/* {activeTab === "Delivery" || activeTab === "Hotel" || activeTab === 'Dine In' ? ( */}
               <Tooltip title={data?.info} arrow>
                 <div
@@ -756,6 +759,41 @@ const Header = (props) => {
     }
   };
 
+  const handleOpenTableView = () => {
+    if (location?.pathname === "/tableView") {
+      return;
+    }
+    setTablePassword("");
+    setTablePasswordModal(true);
+    setTimeout(() => {
+      tablePasswordInputRef.current?.focus();
+    }, 0);
+  };
+
+  const handleTablePasswordSubmit = async () => {
+    try {
+      const body = { userPassword: tablePassword };
+      const response = await axios.post(
+        `${BACKEND_BASE_URL}userrouter/chkPassword`,
+        body,
+        config
+      );
+      if (response.status === 200) {
+        setTablePasswordModal(false);
+        setTablePassword("");
+        naviagate("/tableView");
+      }
+    } catch (error) {
+      const apiMessage =
+        (typeof error?.response?.data === 'string' && error.response.data) ||
+        error?.response?.data?.message ||
+        error?.message ||
+        "Invalid password";
+      toast.error(apiMessage);
+      setTablePassword("");
+    }
+  };
+
   const handleCommonSearch = async () => {
     await axios
       .get(
@@ -913,11 +951,7 @@ const Header = (props) => {
               />
             </div>
             <div className="header_icon cursor-pointer grid content-center">
-              <CurrencyRupeeIcon
-                onClick={() => {
-                  naviagate("/tableView");
-                }}
-              />
+              <CurrencyRupeeIcon onClick={handleOpenTableView} />
             </div>
             {/* <div className="header_icon cursor-pointer grid content-center">
               <NotificationsIcon />
@@ -958,6 +992,57 @@ const Header = (props) => {
                   }}
                 >
                   No
+                </button>
+              </div>
+            </div>
+          </Box>
+        </Modal>
+        <Modal
+          open={tablePasswordModal}
+          onClose={() => {
+            setTablePasswordModal(false);
+            setTablePassword("");
+          }}
+          aria-labelledby="table-pw-modal-title"
+          aria-describedby="table-pw-modal-description"
+          disableAutoFocus
+        >
+          <Box sx={style} className="p-4 rounded-md">
+            <Typography id="table-pw-modal-title" variant="h6" component="h2" className="mb-4">
+              Enter Password
+            </Typography>
+            <input
+              type="password"
+              value={tablePassword}
+              onChange={(e) => setTablePassword(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleTablePasswordSubmit();
+                }
+              }}
+              className="w-full p-2 border rounded-md mb-4"
+              placeholder="Enter password"
+              ref={tablePasswordInputRef}
+              autoFocus
+            />
+            <div className="w-full text-base flex gap-4 p-1">
+              <div className="w-full">
+                <button
+                  className="text-base button px-2 w-full py-1 rounded-md text-white"
+                  onClick={handleTablePasswordSubmit}
+                >
+                  OK
+                </button>
+              </div>
+              <div className="w-full">
+                <button
+                  className="another_2 button text-base w-full px-2 py-1 rounded-md text-white"
+                  onClick={() => {
+                    setTablePasswordModal(false);
+                    setTablePassword("");
+                  }}
+                >
+                  Cancel
                 </button>
               </div>
             </div>
