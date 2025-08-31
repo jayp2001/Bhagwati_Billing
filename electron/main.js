@@ -3,7 +3,7 @@ const path = require('path');
 const { exec } = require('child_process');
 const os = require('os');
 const { machineIdSync } = require('node-machine-id');
-const isDev = false;
+const isDev = true;
 
 let mainWindow;
 
@@ -110,7 +110,7 @@ ipcMain.on("set-title", async (event, title) => {
     console.log("set-title", title);
     const printer = title.printer;
     const data = title.data;
-    const printWindow = new BrowserWindow({ show: false });
+    const printWindow = new BrowserWindow({ show: true });
     await printWindow.loadURL(`data:text/html,` + encodeURIComponent(data));
     console.log("printWindow", title.printer);
     try {

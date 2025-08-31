@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { useActionData } from "react-router-dom";
 
 const KOTDineIn = (props) => {
-  // console.log('props.data', props.data)
+
   const customerData =
     props && props.data && props.data.customerDetails
       ? props.data.customerDetails
@@ -30,6 +30,18 @@ const KOTDineIn = (props) => {
           borderBottom: props.data.billComment ? "1px solid black" : "0px",
         }}
       >
+        {props.data?.isRunning && <div
+          style={{
+            padding: "10px 0px 10px 0px",
+            borderBottom: "1px solid black",
+          }}
+        >
+          <div
+            style={{ fontWeight: "bold", fontSize: "16px", }}
+          >
+            Running Table
+          </div>
+        </div>}
         {(props.isEdit || props.isDelete || props.data.isEdit || props.data.isDelete) &&
           <div
             style={{
