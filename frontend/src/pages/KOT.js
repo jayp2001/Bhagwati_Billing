@@ -43,7 +43,7 @@ const KOT = (props) => {
             {/* {props.data.billPayType == 'cash'?'SHRI BHAGAWATI':props.data.firmData.firmName} */}
             {props.data.billType} - KOT
             <br />
-            {props.isEdit ? "( NEW BILL )" : ""}
+            {props.isEdit ? `( NEW BILL | ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })} )` : ""}
             <p style={{ fontSize: "14px", margin: "0" }}>
               {props.data.billPayType == "complimentary" ? "Complimentary" : ""}
               {props.data.billPayType == "cash" ? "Cash" : ""}

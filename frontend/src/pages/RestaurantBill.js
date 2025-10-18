@@ -38,7 +38,7 @@ const RestaurantBill = (props) => {
               padding: "5px 0px 5px",
             }}
           >
-            New Bill
+            New Bill | {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
           </div>}
         <div
           style={{
@@ -273,7 +273,7 @@ const RestaurantBill = (props) => {
                   }}
                 >
                   {props.data.billType == "Pick Up"
-                    ? props.data.justToken
+                    ? props.data.tokenNo
                     : props.data.tokenNo}{" "}
                 </p>
               </div>

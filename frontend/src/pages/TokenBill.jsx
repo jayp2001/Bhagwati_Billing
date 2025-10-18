@@ -30,7 +30,7 @@ const TokenBil = (props) => {
           <div
             style={{ fontWeight: "bold", fontSize: "14px", lineHeight: "24px", borderBottom: '1px solid black', padding: '5px 0px 5px' }}
           >
-            New Bill
+            New Bill | {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
           </div>}
         <div
           style={{

@@ -3,7 +3,7 @@ const path = require('path');
 const { exec } = require('child_process');
 const os = require('os');
 const { machineIdSync } = require('node-machine-id');
-const isDev = true;
+const isDev = false;
 
 let mainWindow;
 
@@ -107,27 +107,55 @@ ipcMain.on("findPrinter", async (event, title) => {
 });
 
 ipcMain.on("set-title", async (event, title) => {
-    console.log("set-title", title);
     const printer = title.printer;
     const data = title.data;
-    const printWindow = new BrowserWindow({ show: true });
+    const printWindow = new BrowserWindow({ show: false });
     await printWindow.loadURL(`data:text/html,` + encodeURIComponent(data));
-    console.log("printWindow", title.printer);
+
+    const printOptions = {
+        silent: true,
+        printBackground: true,
+        margins: {
+            marginType: "custom",
+            top: printer.marginTop,
+            bottom: printer.marginBottom,
+            left: printer.marginLeft,
+            right: printer.marginRight,
+        },
+        deviceName: printer.printerName,
+    };
+
+    // Safety timer in case callback never fires
+    const cleanupTimer = setTimeout(() => {
+        if (printWindow && !printWindow.isDestroyed()) {
+            printWindow.destroy();
+        }
+    }, 15000);
+
     try {
-        printWindow.webContents.print({
-            silent: true,
-            printBackground: true,
-            margins: {
-                marginType: "custom",
-                top: printer?.marginTop || 0,
-                bottom: printer?.marginBottom || 0,
-                left: printer?.marginLeft || 0,
-                right: printer?.marginRight || 0,
-            },
-            deviceName: printer?.printerName || "",
+        printWindow.webContents.print(printOptions, (success, failureReason) => {
+            clearTimeout(cleanupTimer);
+            if (printWindow && !printWindow.isDestroyed()) {
+                printWindow.close();
+            }
+
+            if (success) {
+                // Notify renderer of success
+                mainWindow?.webContents?.send("print-result", { success: true });
+            } else {
+                // Notify renderer of error and show a fallback dialog
+                mainWindow?.webContents?.send("print-result", { success: false, error: failureReason });
+                dialog.showErrorBox("Print Error", failureReason || "Unknown error while printing.");
+            }
         });
     } catch (error) {
-        console.log("error", error);
+        clearTimeout(cleanupTimer);
+        if (printWindow && !printWindow.isDestroyed()) {
+            printWindow.destroy();
+        }
+        const message = error?.message || "Unknown print error";
+        mainWindow?.webContents?.send("print-result", { success: false, error: message });
+        dialog.showErrorBox("Print Error", message);
     }
 });
 

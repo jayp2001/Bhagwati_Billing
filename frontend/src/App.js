@@ -85,9 +85,9 @@ const getPrintData = (data) => {
     case 'Delivery':
       return renderToString(<RestaurantBill data={data} />);
     case 'Hotel':
-      return renderToString(<HotelBill data={data} />);
+      return renderToString(<HotelBill data={data} isEdit={data.isEdit} />);
     case 'Dine In':
-      return renderToString(<DineInBill data={data} />);
+      return renderToString(<DineInBill data={data} isEdit={data.isEdit} />);
     default:
       return renderToString(<RestaurantBill data={data} />);
   }
@@ -96,13 +96,13 @@ const getPrintData = (data) => {
 const getKotData = (data) => {
   switch (data.billType) {
     case 'Pick Up':
-      return renderToString(<KOT data={data} />);
+      return renderToString(<KOT data={data} isEdit={data.isEdit} />);
     case 'Delivery':
-      return renderToString(<KOT data={data} />);
+      return renderToString(<KOT data={data} isEdit={data.isEdit} />);
     case 'Hotel':
-      return renderToString(<KOT data={data} />);
+      return renderToString(<KOT data={data} isEdit={data.isEdit} />);
     case 'Dine In':
-      return renderToString(<KOTDineIn data={data} />);
+      return renderToString(<KOTDineIn data={data} isEdit={data.isEdit} />);
     default:
       return renderToString(<KOT data={data} />);
   }
@@ -378,10 +378,15 @@ const App = () => {
       console.log('Socket connected');
     });
 
+    socket.on('test', (message) => {
+      console.log('test', message);
+    });
+
     socket.on(`print_Bill_${macAddress}`, (message) => {
       console.log('message_BILL', message);
       try {
         const printer = getPrinter(message);
+        console.log('message', message);
         console.log('Selected bill printer', printer);
         const printBill = {
           printer,
