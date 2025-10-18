@@ -403,13 +403,13 @@ const Header = (props) => {
     setError(false);
   }
   const statusColors = {
-    "Cancel": 'bg-red-200',
-    "On Delivery": 'bg-white',
-    "Food Ready": "bg-white",
-    "Print": 'bg-white',
-    "complete": "bg-white",
-    "CancelToken": "bg-pink-200",
-    "complete": "bg-white"
+    "Cancel": "bg-red-400 text-red-800",        // error/cancel
+    "Food Ready": "bg-blue-300 text-blue-800", // in-progress
+    "On Delivery": "bg-orange-300 text-yellow-800", // warning/ready
+    "Print": "bg-gray-300 text-gray-800",       // neutral
+    "CancelToken": "bg-pink-300 text-pink-800", // soft cancel/secondary
+    "Complete": "bg-green-300 text-green-800",  // success/done
+    "complete": "bg-green-300 text-green-800",  // success/done
   };
 
   const filteredBills = recentBill.filter((val) =>
@@ -417,7 +417,7 @@ const Header = (props) => {
   );
   const list = (anchor) => (
     <Box
-      sx={{ width: anchor === "top" || anchor === "bottom" ? "auto" : 660 }}
+      sx={{ width: anchor === "top" || anchor === "bottom" ? "auto" : 750 }}
       role="presentation"
     // onClick={toggleDrawer(anchor, false)}
     >
@@ -523,7 +523,9 @@ const Header = (props) => {
                 getBbill(data.billId);
               }}
             >
-              <div className="pl-6 capitalize">{data.tokenNo} {"(" + data.billPayType + ")"}</div>
+              <Tooltip title={data?.billStatus} arrow>
+                <div className="pl-6 capitalize">{data.tokenNo} {"(" + data.billPayType + ")"}</div>
+              </Tooltip>
               {/* {activeTab === "Delivery" || activeTab === "Hotel" || activeTab === 'Dine In' ? ( */}
               <Tooltip title={data?.info} arrow>
                 <div

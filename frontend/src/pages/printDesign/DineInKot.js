@@ -123,7 +123,7 @@ const KOTDineIn = (props) => {
                   padding: "2px",
                 }}
               >
-                Table NO
+                Table No
               </div>
               <div
                 style={{

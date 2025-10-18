@@ -50,7 +50,7 @@
 }
 
 .analyzeContainer {
-    height: calc(100vh - 500px);
+    height: calc(100vh - 550px);
     width: 100%;
     word-wrap: break-word;
     background: #fff;

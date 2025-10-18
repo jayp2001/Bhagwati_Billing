@@ -63,8 +63,8 @@ const TableView = () => {
     };
 
     const getAllDataByFilter = async () => {
-        const startDate = state[0].startDate.toISOString().slice(0, 10);
-        const endDate = state[0].endDate.toISOString().slice(0, 10);
+        const startDate = state[0].startDate;
+        const endDate = state[0].endDate;
         await axios
             .get(`${BACKEND_BASE_URL}billingrouter/getBillingStaticsData?startDate=${startDate}&endDate=${endDate}`, config)
             .then((res) => {

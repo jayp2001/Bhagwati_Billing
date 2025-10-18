@@ -15,6 +15,7 @@ import Timer from "./Timer";
 import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
 import { Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import TableBarIcon from '@mui/icons-material/TableBar';
 
 const Cards = ({ data }) => {
   const navigate = useNavigate();
@@ -101,10 +102,13 @@ const Cards = ({ data }) => {
               {data.billType === 'Dine In' &&
                 <div>
                   <div className="flex  items-center">
+                    <div className="headr_icon">
+                      <TableBarIcon className="text-gray-400" />
+                    </div>
                     <div className="headr_icon w-full flex justify-between">
-                      <div className="text-gray-700 text-sm ml-1">
+                      <div className="text-gray-700 text-sm ml-2">
                         {" "}
-                        Table No. {data.tableInfo.tableNo}
+                        {data.tableInfo.tableNo}
                       </div>
                     </div>
                   </div>
@@ -268,6 +272,9 @@ const Cards = ({ data }) => {
                 <PersonIcon />{infoPopUpData?.cashier}
               </div>
               <div className="p-2 flex items-center gap-1">
+                <div className="headr_icon">
+                  <TableBarIcon className="text-gray-400" />
+                </div>
                 {infoPopUpData?.tableInfo?.tableNo ? "Table No. " + infoPopUpData?.tableInfo?.tableNo : ''}
               </div>
             </div>

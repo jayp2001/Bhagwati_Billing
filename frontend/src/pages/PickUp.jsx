@@ -4834,7 +4834,6 @@ const PickUp = () => {
               inputRef={first}
               className="textBoxmUI"
               error={validationError ? true : false}
-              helperText={validationError ? "No Code" : ""}
             />
           </div>
           <div className="sm:w-96 w-96 autocompleteTxt">
