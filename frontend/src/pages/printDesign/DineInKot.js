@@ -27,7 +27,7 @@ const KOTDineIn = (props) => {
           borderCollapse: "collapse",
           textAlign: "center",
           overflow: "hidden",
-          borderBottom: props.data.billComment ? "1px solid black" : "0px",
+          borderBottom: (props.data.billComment != null && String(props.data.billComment).trim() !== "") ? "1px solid black" : "0px",
         }}
       >
         {props.data?.isRunning && <div
@@ -253,7 +253,7 @@ const KOTDineIn = (props) => {
             </tbody>
           </table>
         </div>
-        {props.data.billComment && (
+        {props.data.billComment != null && String(props.data.billComment).trim() !== "" && (
           <div
             style={{
               padding: "2px",

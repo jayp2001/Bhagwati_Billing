@@ -896,6 +896,11 @@ const Header = (props) => {
             </div> */}
           </div>
           <div className="flex h-full align-middle gap-6 mr-3">
+            {(userInfo?.userName || userInfo?.name) && (
+              <div className="flex items-center text-sm font-bold text-gray-700 max-w-[120px] truncate" title={userInfo.userName || userInfo.name}>
+                {userInfo.userName || userInfo.name}
+              </div>
+            )}
             <Tooltip
               title={adminPcId === macAddress ? "This PC is main PC" : "Click to make this PC main"}
               placement="bottom"
@@ -973,6 +978,9 @@ const Header = (props) => {
           disableAutoFocus
         >
           <Box sx={style} className="p-2 rounded-md">
+            {(userInfo?.userName || userInfo?.name) && (
+              <p className="mb-2 text-sm text-gray-600">Logged in as: <span className="font-semibold text-gray-800">{userInfo.userName || userInfo.name}</span></p>
+            )}
             <p>Are You Sure you Want To LogOut?</p>
             <div className="w-full text-base flex  gap-4 p-1 mt-4 ">
               <div className="w-full">

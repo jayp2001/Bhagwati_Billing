@@ -3,7 +3,7 @@ const path = require('path');
 const { exec } = require('child_process');
 const os = require('os');
 const { machineIdSync } = require('node-machine-id');
-const isDev = false;
+const isDev = true;
 
 let mainWindow;
 
@@ -106,58 +106,83 @@ ipcMain.on("findPrinter", async (event, title) => {
         });
 });
 
+
 ipcMain.on("set-title", async (event, title) => {
     const printer = title.printer;
     const data = title.data;
-    const printWindow = new BrowserWindow({ show: false });
+    const printWindow = new BrowserWindow({ show: true });
+    console.log("data>>", data);
     await printWindow.loadURL(`data:text/html,` + encodeURIComponent(data));
-
-    const printOptions = {
-        silent: true,
-        printBackground: true,
-        margins: {
-            marginType: "custom",
-            top: printer.marginTop,
-            bottom: printer.marginBottom,
-            left: printer.marginLeft,
-            right: printer.marginRight,
-        },
-        deviceName: printer.printerName,
-    };
-
-    // Safety timer in case callback never fires
-    const cleanupTimer = setTimeout(() => {
-        if (printWindow && !printWindow.isDestroyed()) {
-            printWindow.destroy();
-        }
-    }, 15000);
-
     try {
-        printWindow.webContents.print(printOptions, (success, failureReason) => {
-            clearTimeout(cleanupTimer);
-            if (printWindow && !printWindow.isDestroyed()) {
-                printWindow.close();
-            }
-
-            if (success) {
-                // Notify renderer of success
-                mainWindow?.webContents?.send("print-result", { success: true });
-            } else {
-                // Notify renderer of error and show a fallback dialog
-                mainWindow?.webContents?.send("print-result", { success: false, error: failureReason });
-                dialog.showErrorBox("Print Error", failureReason || "Unknown error while printing.");
-            }
+        printWindow.webContents.print({
+            silent: true,
+            printBackground: true,
+            margins: {
+                marginType: "custom",
+                top: printer.marginTop,
+                bottom: printer.marginBottom,
+                left: printer.marginLeft,
+                right: printer.marginRight,
+            },
+            deviceName: printer.printerName,
         });
     } catch (error) {
-        clearTimeout(cleanupTimer);
-        if (printWindow && !printWindow.isDestroyed()) {
-            printWindow.destroy();
-        }
-        const message = error?.message || "Unknown print error";
-        mainWindow?.webContents?.send("print-result", { success: false, error: message });
-        dialog.showErrorBox("Print Error", message);
     }
 });
+
+
+// ipcMain.on("set-title", async (event, title) => {
+//     const printer = title.printer;
+//     const data = title.data;
+//     const printWindow = new BrowserWindow({ show: false });
+//     await printWindow.loadURL(`data:text/html,` + encodeURIComponent(data));
+
+//     const printOptions = {
+//         silent: true,
+//         printBackground: true,
+//         margins: {
+//             marginType: "custom",
+//             top: printer.marginTop,
+//             bottom: printer.marginBottom,
+//             left: printer.marginLeft,
+//             right: printer.marginRight,
+//         },
+//         deviceName: printer.printerName,
+//     };
+
+//     // Safety timer in case callback never fires
+//     const cleanupTimer = setTimeout(() => {
+//         if (printWindow && !printWindow.isDestroyed()) {
+//             printWindow.destroy();
+//         }
+//     }, 15000);
+
+//     try {
+//         printWindow.webContents.print(printOptions, (success, failureReason) => {
+//             clearTimeout(cleanupTimer);
+//             if (printWindow && !printWindow.isDestroyed()) {
+//                 printWindow.close();
+//             }
+
+//             if (success) {
+//                 // Notify renderer of success
+//                 mainWindow?.webContents?.send("print-result", { success: true });
+//             } else {
+//                 // Notify renderer of error and show a fallback dialog
+//                 mainWindow?.webContents?.send("print-result", { success: false, error: failureReason });
+//                 dialog.showErrorBox("Print Error", failureReason || "Unknown error while printing.");
+//             }
+//         });
+//     } catch (error) {
+//         clearTimeout(cleanupTimer);
+//         if (printWindow && !printWindow.isDestroyed()) {
+//             printWindow.destroy();
+//         }
+//         const message = error?.message || "Unknown print error";
+//         mainWindow?.webContents?.send("print-result", { success: false, error: message });
+//         dialog.showErrorBox("Print Error", message);
+//     }
+// });
 
 // Dialog handlers for replacing alert() and confirm()
 ipcMain.handle('show-confirm-dialog', async (event, options) => {

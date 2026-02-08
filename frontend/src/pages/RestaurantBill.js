@@ -42,26 +42,25 @@ const RestaurantBill = (props) => {
           </div>}
         <div
           style={{
-            paddingTop: "6px",
-            paddingBottom: "0px",
+            padding: "6px 4px 6px 4px",
             borderBottom: "2px solid black",
           }}
         >
           <div
             style={{
               fontWeight: "700",
-              fontSize: "14px",
+              fontSize: "16px",
               lineHeight: "24px",
-              paddingBottom: "0.5rem",
+              paddingBottom: "6px",
               paddingTop: "0.6rem",
             }}
           >
             {props.data.firmData.firmName}
           </div>
           <div
-            style={{ fontSize: "14px", lineHeight: "20px", fontWeight: "400" }}
+            style={{ fontSize: "12px", lineHeight: "20px", fontWeight: "500" }}
           >
-            {props.data.firmData.firmAddress}
+            {props.data.firmData.firmAddress} - {props.data.firmData.pincode}
           </div>
           <div
             style={{
@@ -70,36 +69,34 @@ const RestaurantBill = (props) => {
               lineHeight: "20px",
               marginBottom: "8px",
               paddingBottom: "4px",
-              paddingTop: "10px",
-              fontWeight: '600',
-              letterSpacing: '1px'
             }}
           >
-            {props.data.firmData.firmMobileNo}
+            PHONE: {props.data.firmData.firmMobileNo} :{" "}
+            {props.data.firmData.otherMobileNo}
           </div>
         </div>
         <div
           style={{
-            padding: "6px 0px 6px 0px",
+            padding: "2px 4px 2px 4px",
             borderBottom: "2px solid black",
           }}
         >
           <div
             className="name font-medium text-sm"
-            style={{ fontWeight: "500", fontSize: "14px" }}
+            style={{ fontWeight: "500", fontSize: "12px", lineHeight: "18px" }}
           >
             GSTIN: {props.data.firmData.gstNumber}
           </div>
         </div>
         <div
           style={{
-            padding: "6px 0px 6px 0px",
+            padding: "2px 4px 2px 4px",
             borderBottom: "2px solid black",
           }}
         >
           <div
             className="name font-bold text-sm"
-            style={{ fontWeight: "700", fontSize: "12px", lineHeight: "20px" }}
+            style={{ fontWeight: "700", fontSize: "12px", lineHeight: "18px" }}
           >
             BILL OF SUPPLY
           </div>
@@ -213,37 +210,67 @@ const RestaurantBill = (props) => {
               <div
                 style={{
                   textAlign: "start",
-                  marginTop: "4px",
+                  marginTop: props.data.billType === "Dine In" ? "6px" : "4px",
                   fontSize: "12px",
                 }}
               >
                 <div>Time: {props.data.billTime}</div>
               </div>
-              <div
-                style={{
-                  textAlign: "start",
-                  marginTop: "4px",
-                  fontSize: "12px",
-                }}
-              >
-                BILL NO :{" "}
-                <span style={{ fontWeight: "700", fontSize: "12px" }}>
-                  {" "}
-                  {props.data.officialBillNo}
-                </span>
-              </div>
-              <div style={{ marginTop: "4px", fontSize: "12px" }}>
-                Bill Type : {props.data.billType}
-              </div>
-              <div style={{ marginTop: "4px", fontSize: "12px" }}>
-                Cashier : {props.data.cashier}
-              </div>
+              {props.data.billType === "Dine In" ? (
+                <>
+                  {props.data.isOfficial && props.data.officialBillNo != null && (
+                    <div style={{ marginTop: "6px", fontSize: "12px" }}>
+                      BILL NO :{" "}
+                      <span style={{ fontWeight: "700", fontSize: "12px" }}>
+                        {props.data.officialBillNo}
+                      </span>
+                    </div>
+                  )}
+                  <div style={{ marginTop: "6px", fontSize: "12px" }}>
+                    Cashier : {props.data.cashier}
+                  </div>
+                  {props?.data?.tableNo && (
+                    <div style={{ marginTop: "6px", fontSize: "12px", maxWidth: "170px" }}>
+                      Token No : {props.data.billType === "Pick Up"
+                        ? props.data.justToken
+                        : props.data.tokenNo}{" "}
+                    </div>
+                  )}
+                  {props?.data?.subTokens && (
+                    <div style={{ marginTop: "6px", fontSize: "12px", maxWidth: "170px" }}>
+                      Sub Token : {props.data.subTokens}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div
+                    style={{
+                      textAlign: "start",
+                      marginTop: "4px",
+                      fontSize: "12px",
+                    }}
+                  >
+                    BILL NO :{" "}
+                    <span style={{ fontWeight: "700", fontSize: "12px" }}>
+                      {props.data.officialBillNo}
+                    </span>
+                  </div>
+                  <div style={{ marginTop: "4px", fontSize: "12px" }}>
+                    Bill Type : {props.data.billType}
+                  </div>
+                  <div style={{ marginTop: "4px", fontSize: "12px" }}>
+                    Cashier : {props.data.cashier}
+                  </div>
+                </>
+              )}
             </div>
 
             <div
               style={{
                 textAlign: "start",
-                maxWidth: "30%",
+                maxWidth: props.data.billType === "Dine In" ? "34%" : "30%",
+                padding: "2px",
                 marginRight: "10px",
               }}
             >
@@ -254,13 +281,13 @@ const RestaurantBill = (props) => {
                   padding: "2px",
                 }}
               >
-                TOKEN NO
+                {props.data.billType === "Dine In" ? "TABLE NO" : "TOKEN NO"}
               </div>
               <div
                 style={{
                   border: "1px solid black",
                   borderCollapse: "collapse",
-                  borderTop: "0px",
+                  borderTop: props.data.billType === "Dine In" ? "1px solid black" : "0px",
                   padding: "2px",
                 }}
               >
@@ -272,28 +299,45 @@ const RestaurantBill = (props) => {
                     lineHeight: "18px",
                   }}
                 >
-                  {props.data.billType == "Pick Up"
-                    ? props.data.tokenNo
-                    : props.data.tokenNo}{" "}
+                  {props.data.billType === "Dine In"
+                    ? props.data.tableNo
+                    : (props.data.billType === "Pick Up"
+                      ? props.data.justToken
+                      : props.data.tokenNo)}{" "}
                 </p>
               </div>
             </div>
           </div>
         </div>
-        <div
-          style={{
-            width: "257px",
-            height: "min-content",
-            borderTop: "1px solid black",
-            padding: "2px",
-          }}
-        >
-          <div style={{ textAlign: "start", width: "100%" }}>
-            <div style={{ textAlign: "start", fontSize: "12px" }}>
-              <div>Note: {props.data.billComment}</div>
+        {props.data.billComment != null && String(props.data.billComment).trim() !== "" && (
+          <div
+            style={{
+              width: "257px",
+              height: "min-content",
+              borderTop: "1px solid black",
+              padding: "2px",
+            }}
+          >
+            <div style={{ textAlign: "start", width: "100%" }}>
+              <div style={{ textAlign: "start", fontSize: "12px" }}>
+                <div>Note: {props.data.billComment}</div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
+        {props.data.billPayType == "due" && props.data.customerName && (
+          <div
+            style={{
+              width: "257px",
+              padding: "2px 4px",
+              borderTop: "1px solid black",
+              textAlign: "center",
+              fontSize: "11px",
+            }}
+          >
+            Due Account: <span style={{ fontWeight: "700" }}>{props.data.customerName}</span>
+          </div>
+        )}
         <div
           className="main_bill h-min"
           style={{ width: " 260px", height: "min-content" }}
@@ -403,8 +447,7 @@ const RestaurantBill = (props) => {
                       fontSize: "13px",
                     }}
                   >
-                    {item.qty}
-                    {item.unit}
+                    {item.qty} {item.unit}
                   </td>
                   <td
                     style={{
@@ -449,10 +492,10 @@ const RestaurantBill = (props) => {
                     fontSize: "14px",
                   }}
                 >
-                  <pre style={{ fontFamily: "Verdana" }}>
-                    Total Qty: {itemList.length}, Sub Total:{" "}
-                    {parseFloat(props.data.subTotal).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </pre>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "Verdana", marginLeft: "10px" }}>
+                    <span>Total Qty : {itemList.length}</span>
+                    <span>Sub Total:{" "}{parseFloat(props.data.subTotal).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  </div>
                 </td>
               </tr>
               <tr className="">

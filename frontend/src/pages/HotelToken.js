@@ -2,7 +2,7 @@ import React from "react";
 import "./css/Bill.css";
 import { QRCodeSVG } from 'qrcode.react';
 
-const HotelBill = (props) => {
+const HotelToken = (props) => {
   return (
     <div
       className="w-fit h-fit"
@@ -69,7 +69,7 @@ const HotelBill = (props) => {
             {props.data.firmData.otherMobileNo}
           </div>
         </div>
-        <div style={{ paddingBottom: "0px", borderBottom: "2px solid black" }}>
+        {/* <div style={{ paddingBottom: "0px", borderBottom: "2px solid black" }}>
           <div
             className="name font-medium text-sm"
             style={{
@@ -81,15 +81,15 @@ const HotelBill = (props) => {
           >
             GSTIN: {props.data.firmData.gstNumber}
           </div>
-        </div>
-        <div style={{ paddingBottom: "0px", borderBottom: "2px solid black" }}>
+        </div> */}
+        {/* <div style={{ paddingBottom: "0px", borderBottom: "2px solid black" }}>
           <div
             className="name font-bold text-sm"
             style={{ fontWeight: "700", fontSize: "12px", lineHeight: "20px" }}
           >
             BILL OF SUPPLY
           </div>
-        </div>
+        </div> */}
         <div style={{ paddingBottom: "0px", borderBottom: "2px solid black" }}>
           <div
             className="name font-bold text-sm"
@@ -191,7 +191,7 @@ const HotelBill = (props) => {
               paddingLeft: "5px",
             }}
           >
-            <div
+            {/* <div
               className="text-start upper_right"
               style={{ textAlign: "start", maxWidth: "75%", fontSize: "10p" }}
             >
@@ -201,7 +201,7 @@ const HotelBill = (props) => {
                   {props.data.officialBillNo}
                 </span>
               </div>
-            </div>
+            </div> */}
             <div
               className="text-start upper_right"
               style={{ textAlign: "start", maxWidth: "75%", fontSize: "10p" }}
@@ -668,4 +668,4 @@ const HotelBill = (props) => {
   );
 };
 
-export default HotelBill;
+export default HotelToken;

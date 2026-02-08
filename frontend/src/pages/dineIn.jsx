@@ -228,6 +228,7 @@ const DineIn = () => {
     const [suggestionSelectedValue, setSuggestionSelectedValue] = useState("");
     const [inputValue, setInputValue] = useState("");
     const suggestionListRef = useRef(null);
+    const isSavingRef = React.useRef(false);
     const [subKotList, setSubKotList] = useState([]);
     const [useList, setUserList] = useState([]);
     const [tabValue, setTabValue] = useState(0);
@@ -457,10 +458,16 @@ const DineIn = () => {
         }));
     };
     const handleShoetCutKey = (event) => {
+        if (loading || success || isSavingRef.current) return;
         if (event.key === "F12") {
             isEdit
                 ? editBill()
                 : saveBill();
+        }
+        if (event.key === "F9") {
+            if (status?.toLocaleLowerCase() === "print" || status?.toLocaleLowerCase() === "complete") {
+                saveBillAtprintOfficial();
+            }
         }
         if (event.key === "F1") {
             isEdit
@@ -659,7 +666,9 @@ const DineIn = () => {
         billError,
         hotelFormData,
         items,
-        // tab,
+        loading,
+        success,
+        status,
     ]);
     const handleInputNameChange = async (e, value) => {
         // const filtered = value ? data.filter(item =>
@@ -803,7 +812,7 @@ const DineIn = () => {
                     : billData.subTotal - billData.settledAmount,
             itemsData: items,
             billComment: billData.billCommentAuto?.join(", "),
-            isOfficial: billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false,
+            isOfficial: billData.billPayType == 'complimentary' ? true : (billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false),
             onlineId: upiId,
             appriciateLine: billTypeCategory["Dine In"]?.appriciateLine,
             footerBill: billTypeCategory["Dine In"]?.billFooterNote,
@@ -878,6 +887,11 @@ const DineIn = () => {
                         ? error.response.data
                         : "Network Error ...!!!"
                 );
+                setLoading(false);
+                isSavingRef.current = false;
+            })
+            .finally(() => {
+                isSavingRef.current = false;
             });
     };
 
@@ -942,7 +956,7 @@ const DineIn = () => {
                     : billData.subTotal - billData.settledAmount,
             itemsData: items,
             billComment: billData.billCommentAuto?.join(", "),
-            isOfficial: billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false,
+            isOfficial: billData.billPayType == 'complimentary' ? true : (editBillData?.isOfficial ? true : (billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false)),
             upiJson: upiJson ? upiJson : upiList[0],
             onlineId: upiId,
             tableNo: (table == 'null' || table == null) ? tempTable : table, assignCaptain: captain,
@@ -1023,6 +1037,117 @@ const DineIn = () => {
                         ? error.response.data
                         : "Network Error ...!!!"
                 );
+                setLoading(false);
+                isSavingRef.current = false;
+            })
+            .finally(() => {
+                isSavingRef.current = false;
+            });
+    };
+    const addBillDataAtPrintOfficial = async () => {
+        setLoading(true);
+        const upiJson = upiList?.filter((data) => data.onlineId == upiId)[0];
+        const customData = {
+            ...editBillData,
+            ...billData,
+            customerDetails: {
+                ...customerData,
+            },
+            accountId: dueFormData.accountId,
+            dueNote: dueFormData.dueNote,
+            tableNo: (table == 'null' || table == null) ? tempTable : table, assignCaptain: captain,
+            billType: "Dine In",
+            printBill: true,
+            printKot: false,
+            firmId: billTypeCategory['Dine In']?.firmId,
+            totalDiscount:
+                billData.discountType == "none"
+                    ? 0
+                    : billData.subTotal - billData.settledAmount,
+            itemsData: items,
+            billComment: billData.billCommentAuto?.join(", "),
+            isOfficial: true,
+            upiJson: upiJson ? upiJson : upiList[0],
+            onlineId: upiId,
+            appriciateLine: billTypeCategory["Dine In"]?.appriciateLine,
+            footerBill: billTypeCategory["Dine In"]?.billFooterNote,
+        };
+        await axios
+            .post(
+                `${BACKEND_BASE_URL}billingrouter/updateDineInBillData`,
+                customData,
+                config
+            )
+            .then((res) => {
+                try {
+                    setSuccess(true);
+                    setLoading(false);
+                    setItems([]);
+                    setFullFormData({
+                        inputCode: "",
+                        itemId: "",
+                        inputName: "",
+                        itemName: "",
+                        qty: 1,
+                        unit: "",
+                        comment: "",
+                        selectedItem: "",
+                        selectedUnit: "",
+                        itemPrice: 0,
+                        price: 0,
+                        commentAutoComplete: [],
+                    });
+                    setCustomerData({
+                        customerId: "",
+                        addressId: "",
+                        mobileNo: "",
+                        customerName: "",
+                        address: "",
+                        locality: "",
+                        birthDate: "",
+                        aniversaryDate: "",
+                    });
+                    setBillData({
+                        subTotal: 0,
+                        discountType: "none",
+                        discountValue: 0,
+                        settledAmount: "",
+                        billPayType: "cash",
+                        billComment: "",
+                        billCommentAuto: [],
+                    });
+                    const pickupBillPrint = renderToString(
+                        res && res.data && res.data.isOfficial ? (
+                            <RestaurantBill data={res.data} />
+                        ) : (
+                            <DineInBill data={res.data} />
+                        )
+                    );
+                    const printerDataKot = {
+                        printer: dineinbill[0],
+                        data: pickupBillPrint,
+                    };
+                    if (res && res.data && res.data.printBill) {
+                        ipcRenderer.send("set-title", printerDataKot);
+                    }
+                    setTimeout(() => {
+                        navigate("/dashboard");
+                    }, 1500);
+                } catch (rrr) {
+                    console.log("error in addBillDataAtPrintOfficial", rrr);
+                }
+            })
+            .catch((error) => {
+                setError(
+                    error.response && error.response.data
+                        ? error.response.data
+                        : "Network Error ...!!!"
+                );
+                setLoading(false);
+                isSavingRef.current = false;
+            })
+            .finally(() => {
+                isSavingRef.current = false;
             });
     };
     const justaddBillDataAtPrint = async () => {
@@ -1047,7 +1172,7 @@ const DineIn = () => {
                     : billData.subTotal - billData.settledAmount,
             itemsData: items,
             billComment: billData.billCommentAuto?.join(", "),
-            isOfficial: billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false,
+            isOfficial: billData.billPayType == 'complimentary' ? true : (editBillData?.isOfficial ? true : (billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false)),
             onlineId: upiId,
             tableNo: (table == 'null' || table == null) ? tempTable : table, assignCaptain: captain,
             appriciateLine: billTypeCategory["Dine In"]?.appriciateLine,
@@ -1123,6 +1248,11 @@ const DineIn = () => {
                         ? error.response.data
                         : "Network Error ...!!!"
                 );
+                setLoading(false);
+                isSavingRef.current = false;
+            })
+            .finally(() => {
+                isSavingRef.current = false;
             });
     };
     const settelBillDataAtPrint = async () => {
@@ -1149,7 +1279,7 @@ const DineIn = () => {
             itemsData: items,
             tableNo: (table == 'null' || table == null) ? tempTable : table, assignCaptain: captain,
             billComment: billData.billCommentAuto?.join(", "),
-            isOfficial: billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false,
+            isOfficial: billData.billPayType == 'complimentary' ? true : (editBillData?.isOfficial ? true : (billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false)),
             onlineId: upiId,
             appriciateLine: billTypeCategory["Dine In"]?.appriciateLine,
             footerBill: billTypeCategory["Dine In"]?.billFooterNote,
@@ -1224,6 +1354,11 @@ const DineIn = () => {
                         ? error.response.data
                         : "Network Error ...!!!"
                 );
+                setLoading(false);
+                isSavingRef.current = false;
+            })
+            .finally(() => {
+                isSavingRef.current = false;
             });
     };
     const printBill = async () => {
@@ -1553,7 +1688,7 @@ const DineIn = () => {
                     : billData.subTotal - billData.settledAmount,
             itemsData: items,
             billComment: billData.billCommentAuto?.join(", "),
-            isOfficial: billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false,
+            isOfficial: billData.billPayType == 'complimentary' ? true : (billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false),
             onlineId: upiId,
             appriciateLine: billTypeCategory["Dine In"]?.appriciateLine,
             footerBill: billTypeCategory["Dine In"]?.billFooterNote,
@@ -1611,6 +1746,11 @@ const DineIn = () => {
                         ? error.response.data
                         : "Network Error ...!!!"
                 );
+                setLoading(false);
+                isSavingRef.current = false;
+            })
+            .finally(() => {
+                isSavingRef.current = false;
             });
     };
 
@@ -1632,7 +1772,7 @@ const DineIn = () => {
             billStatus: "running",
             itemsData: items,
             billComment: billData.billCommentAuto?.join(", "),
-            isOfficial: billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false,
+            isOfficial: billData.billPayType == 'complimentary' ? true : (editBillData?.isOfficial ? true : (billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false)),
             onlineId: upiId,
             tableNo: table,
             assignCaptain: captain,
@@ -1707,6 +1847,11 @@ const DineIn = () => {
                         ? error.response.data
                         : "Network Error ...!!!"
                 );
+                setLoading(false);
+                isSavingRef.current = false;
+            })
+            .finally(() => {
+                isSavingRef.current = false;
             });
     };
     const justEditBillDataFunction = async () => {
@@ -1727,7 +1872,7 @@ const DineIn = () => {
             billStatus: "running",
             itemsData: items,
             billComment: billData.billCommentAuto?.join(", "),
-            isOfficial: billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false,
+            isOfficial: billData.billPayType == 'complimentary' ? true : (editBillData?.isOfficial ? true : (billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false)),
             onlineId: upiId,
             tableNo: table,
             assignCaptain: captain,
@@ -1789,6 +1934,11 @@ const DineIn = () => {
                         ? error.response.data
                         : "Network Error ...!!!"
                 );
+                setLoading(false);
+                isSavingRef.current = false;
+            })
+            .finally(() => {
+                isSavingRef.current = false;
             });
     };
 
@@ -1814,7 +1964,7 @@ const DineIn = () => {
                     : billData.subTotal - billData.settledAmount,
             itemsData: items,
             billComment: billData.billCommentAuto?.join(", "),
-            isOfficial: billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false,
+            isOfficial: billData.billPayType == 'complimentary' ? true : (editBillData?.isOfficial ? true : (billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false)),
             onlineId: upiId,
             tableNo: (table == 'null' || table == null) ? tempTable : table, assignCaptain: captain,
             appriciateLine: billTypeCategory["Dine In"]?.appriciateLine,
@@ -1905,6 +2055,11 @@ const DineIn = () => {
                         ? error.response.data
                         : "Network Error ...!!!"
                 );
+                setLoading(false);
+                isSavingRef.current = false;
+            })
+            .finally(() => {
+                isSavingRef.current = false;
             });
     };
     const editKotPrintDataFunction = async () => {
@@ -1929,7 +2084,7 @@ const DineIn = () => {
                     : billData.subTotal - billData.settledAmount,
             itemsData: items,
             billComment: billData.billCommentAuto?.join(", "),
-            isOfficial: billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false,
+            isOfficial: billData.billPayType == 'complimentary' ? true : (editBillData?.isOfficial ? true : (billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false)),
             onlineId: upiId,
             tableNo: (table == 'null' || table == null) ? tempTable : table, assignCaptain: captain,
             appriciateLine: billTypeCategory["Dine In"]?.appriciateLine,
@@ -2020,6 +2175,11 @@ const DineIn = () => {
                         ? error.response.data
                         : "Network Error ...!!!"
                 );
+                setLoading(false);
+                isSavingRef.current = false;
+            })
+            .finally(() => {
+                isSavingRef.current = false;
             });
     };
 
@@ -2092,136 +2252,120 @@ const DineIn = () => {
             });
     };
     const saveBill = () => {
-        if (loading || success) {
-        } else {
-            if (
-                !items ||
-                items.length < 1
-                // !billData ||
-                // !billData.subTotal ||
-                // !billData.settledAmount ||
-                // !billData.discountType ||
-                // (billData.discountType != "none" && !billData.discountValue)
-            ) {
-                setError("Please Fill All Field");
-            } else if (billData.settledAmount <= 0) {
-                setError("Sattle Amount can not be less than zero");
-            } else {
-                // console.log(">>", fullFormData, fullFormData.stockInDate, fullFormData.stockInDate != 'Invalid Date' ? 'ue' : 'false')
-                addBillData();
-                setValidationError(false);
-            }
+        if (loading || success || isSavingRef.current) return;
+        if (
+            !items ||
+            items.length < 1
+        ) {
+            setError("Please Fill All Field");
+            return;
         }
+        if (billData.settledAmount <= 0) {
+            setError("Sattle Amount can not be less than zero");
+            return;
+        }
+        isSavingRef.current = true;
+        addBillData();
+        setValidationError(false);
     };
     const saveBillAtprint = () => {
-        if (loading || success) {
-        } else {
-            if (
-                !items ||
-                items.length < 1 ||
-                !billData ||
-                !billData.subTotal ||
-                !billData.settledAmount ||
-                !billData.discountType ||
-                (billData.discountType != "none" && !billData.discountValue)
-            ) {
-                setError("Please Fill All Field");
-            } else if (billData.settledAmount <= 0) {
-                setError("Sattle Amount can not be less than zero");
-            } else {
-                // console.log(">>", fullFormData, fullFormData.stockInDate, fullFormData.stockInDate != 'Invalid Date' ? 'ue' : 'false')
-                addBillDataAtPrint();
-                setValidationError(false);
-            }
+        if (loading || success || isSavingRef.current) return;
+        if (
+            !items || items.length < 1 || !billData || !billData.subTotal ||
+            !billData.settledAmount || !billData.discountType ||
+            (billData.discountType != "none" && !billData.discountValue)
+        ) {
+            setError("Please Fill All Field");
+            return;
         }
+        if (billData.settledAmount <= 0) {
+            setError("Sattle Amount can not be less than zero");
+            return;
+        }
+        isSavingRef.current = true;
+        addBillDataAtPrint();
+        setValidationError(false);
+    };
+    const saveBillAtprintOfficial = () => {
+        if (loading || success || isSavingRef.current) return;
+        if (
+            !items || items.length < 1 || !billData || !billData.subTotal ||
+            !billData.settledAmount || !billData.discountType ||
+            (billData.discountType != "none" && !billData.discountValue)
+        ) {
+            setError("Please Fill All Field");
+            return;
+        }
+        if (billData.settledAmount <= 0) {
+            setError("Sattle Amount can not be less than zero");
+            return;
+        }
+        isSavingRef.current = true;
+        addBillDataAtPrintOfficial();
+        setValidationError(false);
     };
     const justsaveBillAtprint = () => {
-        if (loading || success) {
-        } else {
-            if (
-                !items ||
-                items.length < 1 ||
-                !billData ||
-                !billData.subTotal ||
-                !billData.settledAmount ||
-                !billData.discountType ||
-                (billData.discountType != "none" && !billData.discountValue)
-            ) {
-                setError("Please Fill All Field");
-            } else if (billData.settledAmount <= 0) {
-                setError("Sattle Amount can not be less than zero");
-            } else {
-                // console.log(">>", fullFormData, fullFormData.stockInDate, fullFormData.stockInDate != 'Invalid Date' ? 'ue' : 'false')
-                justaddBillDataAtPrint();
-                setValidationError(false);
-            }
+        if (loading || success || isSavingRef.current) return;
+        if (
+            !items || items.length < 1 || !billData || !billData.subTotal ||
+            !billData.settledAmount || !billData.discountType ||
+            (billData.discountType != "none" && !billData.discountValue)
+        ) {
+            setError("Please Fill All Field");
+            return;
         }
+        if (billData.settledAmount <= 0) {
+            setError("Sattle Amount can not be less than zero");
+            return;
+        }
+        isSavingRef.current = true;
+        justaddBillDataAtPrint();
+        setValidationError(false);
     };
 
 
     const justSaveBill = () => {
-        if (loading || success) {
-        } else {
-            if (
-                !items ||
-                items.length < 1
-                // !billData ||
-                // !billData.subTotal ||
-                // !billData.settledAmount ||
-                // (billData.discountType != "none" && !billData.discountValue)
-            ) {
-                setError("Please Fill All Field");
-            } else if (billData.settledAmount <= 0) {
-                setError("Sattle Amount can not be less than zero");
-            } else {
-                // console.log(">>", fullFormData, fullFormData.stockInDate, fullFormData.stockInDate != 'Invalid Date' ? 'ue' : 'false')
-                justSaveBillData();
-            }
+        if (loading || success || isSavingRef.current) return;
+        if (!items || items.length < 1) {
+            setError("Please Fill All Field");
+            return;
         }
+        if (billData.settledAmount <= 0) {
+            setError("Sattle Amount can not be less than zero");
+            return;
+        }
+        isSavingRef.current = true;
+        justSaveBillData();
     };
     const justEditBill = () => {
-        if (loading || success) {
-        } else {
-            if (
-                !items ||
-                items.length < 1
-                // ||
-                // !billData ||
-                // !billData.subTotal ||
-                // !billData.settledAmount ||
-                // !billData.discountType ||
-                // (billData.discountType != "none" && !billData.discountValue)
-            ) {
-                setError("Please Fill All Field");
-            } else if (billData.settledAmount <= 0) {
-                setError("Sattle Amount can not be less than zero");
-            } else {
-                // console.log(">>", fullFormData, fullFormData.stockInDate, fullFormData.stockInDate != 'Invalid Date' ? 'ue' : 'false')
-                justEditBillDataFunction();
-            }
+        if (loading || success || isSavingRef.current) return;
+        if (!items || items.length < 1) {
+            setError("Please Fill All Field");
+            return;
         }
+        if (billData.settledAmount <= 0) {
+            setError("Sattle Amount can not be less than zero");
+            return;
+        }
+        isSavingRef.current = true;
+        justEditBillDataFunction();
     };
     const settelBill = () => {
-        if (loading || success) {
-        } else {
-            if (
-                !items ||
-                items.length < 1
-                ||
-                !billData ||
-                !billData.subTotal ||
-                !billData.settledAmount ||
-                !billData.discountType ||
-                (billData.discountType != "none" && !billData.discountValue)
-            ) {
-                setError("Please Fill All Field");
-            } else if (billData.settledAmount <= 0) {
-                setError("Sattle Amount can not be less than zero");
-            } else {
-                // console.log(">>", fullFormData, fullFormData.stockInDate, fullFormData.stockInDate != 'Invalid Date' ? 'ue' : 'false')
-                settelBillDataAtPrint();
-            }
+        if (loading || success || isSavingRef.current) return;
+        if (
+            !items || items.length < 1 || !billData || !billData.subTotal ||
+            !billData.settledAmount || !billData.discountType ||
+            (billData.discountType != "none" && !billData.discountValue)
+        ) {
+            setError("Please Fill All Field");
+            return;
         }
+        if (billData.settledAmount <= 0) {
+            setError("Sattle Amount can not be less than zero");
+            return;
+        }
+        isSavingRef.current = true;
+        settelBillDataAtPrint();
     };
     const cancleBill = () => {
         setItems([])
@@ -2242,67 +2386,51 @@ const DineIn = () => {
         })
     };
     const editBillPrint = () => {
-        if (loading || success) {
-        } else {
-            if (
-                !items ||
-                items.length < 1 ||
-                !billData ||
-                !billData.subTotal ||
-                !billData.settledAmount ||
-                !billData.discountType ||
-                (billData.discountType != "none" && !billData.discountValue)
-            ) {
-                setError("Please Fill All Field");
-            } else if (billData.settledAmount <= 0) {
-                setError("Sattle Amount can not be less than zero");
-            } else {
-                editBillPrintDataFunction();
-            }
+        if (loading || success || isSavingRef.current) return;
+        if (
+            !items || items.length < 1 || !billData || !billData.subTotal ||
+            !billData.settledAmount || !billData.discountType ||
+            (billData.discountType != "none" && !billData.discountValue)
+        ) {
+            setError("Please Fill All Field");
+            return;
         }
+        if (billData.settledAmount <= 0) {
+            setError("Sattle Amount can not be less than zero");
+            return;
+        }
+        isSavingRef.current = true;
+        editBillPrintDataFunction();
     };
     const editKotPrint = () => {
-        if (loading || success) {
-        } else {
-            if (
-                !items ||
-                items.length < 1 ||
-                !billData ||
-                !billData.subTotal ||
-                !billData.settledAmount ||
-                !billData.discountType ||
-                (billData.discountType != "none" && !billData.discountValue)
-            ) {
-                setError("Please Fill All Field");
-            } else if (billData.settledAmount <= 0) {
-                setError("Sattle Amount can not be less than zero");
-            } else {
-                // console.log(">>", fullFormData, fullFormData.stockInDate, fullFormData.stockInDate != 'Invalid Date' ? 'ue' : 'false')
-                editKotPrintDataFunction();
-            }
+        if (loading || success || isSavingRef.current) return;
+        if (
+            !items || items.length < 1 || !billData || !billData.subTotal ||
+            !billData.settledAmount || !billData.discountType ||
+            (billData.discountType != "none" && !billData.discountValue)
+        ) {
+            setError("Please Fill All Field");
+            return;
         }
+        if (billData.settledAmount <= 0) {
+            setError("Sattle Amount can not be less than zero");
+            return;
+        }
+        isSavingRef.current = true;
+        editKotPrintDataFunction();
     };
     const editBill = () => {
-        if (loading || success) {
-        } else {
-            if (
-                !items ||
-                items.length < 1
-                // ||
-                // !billData ||
-                // !billData.subTotal ||
-                // !billData.settledAmount ||
-                // !billData.discountType ||
-                // (billData.discountType != "none" && !billData.discountValue)
-            ) {
-                setError("Please Fill All Field");
-            } else if (billData.settledAmount <= 0) {
-                setError("Sattle Amount can not be less than zero");
-            } else {
-                // console.log(">>", fullFormData, fullFormData.stockInDate, fullFormData.stockInDate != 'Invalid Date' ? 'ue' : 'false')
-                editBillDataFunction();
-            }
+        if (loading || success || isSavingRef.current) return;
+        if (!items || items.length < 1) {
+            setError("Please Fill All Field");
+            return;
         }
+        if (billData.settledAmount <= 0) {
+            setError("Sattle Amount can not be less than zero");
+            return;
+        }
+        isSavingRef.current = true;
+        editBillDataFunction();
     };
     const handleQuantityChange = (e) => {
         const value = e.target.value;
@@ -2322,6 +2450,18 @@ const DineIn = () => {
             } else {
                 commentInputRef.current && commentInputRef.current.focus();
             }
+        }
+    };
+    const handleFormItemPriceChange = (e) => {
+        const value = e.target.value;
+        if (regex.test(value) || value === "") {
+            const numVal = parseFloat(value) || 0;
+            const qty = parseFloat(fullFormData.qty) || 0;
+            setFullFormData((prevState) => ({
+                ...prevState,
+                itemPrice: value,
+                price: numVal * qty,
+            }));
         }
     };
     const handleEnterPressFirst = async (e) => {
@@ -3065,7 +3205,29 @@ const DineIn = () => {
                         </FormControl>
                     </div>
                     <div className="sm:w-28 w-28">
-                        <TextField value={fullFormData.itemPrice} className="textBoxmUI" />
+                        <TextField
+                            placeholder="Price"
+                            className="textBoxmUI"
+                            value={fullFormData.itemPrice ?? ""}
+                            onChange={handleFormItemPriceChange}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    commentInputRef.current && commentInputRef.current.focus();
+                                }
+                            }}
+                            disabled={!fullFormData.inputName}
+                            variant="outlined"
+                        />
+                    </div>
+                    <div className="sm:w-28 w-28">
+                        <TextField
+                            placeholder="Total"
+                            className="textBoxmUI"
+                            value={((parseFloat(fullFormData.qty) || 0) * (parseFloat(fullFormData.itemPrice) || 0)).toFixed(2)}
+                            disabled
+                            variant="outlined"
+                        />
                     </div>
                     <div className="sm:w-96 w-96 autocompleteTxt">
                         <TextField
@@ -3753,25 +3915,31 @@ const DineIn = () => {
                                     <div className="flex w-full justify-between pl-2 pr-2 gap-4 main_div">
                                         <div>
                                             {(status == 'print' || status == 'complete' || status == 'Cancel') &&
+                                                (() => {
+                                                    const lockComplimentaryAsOnly = isEdit && billData.billPayType === 'complimentary';
+                                                    const disableComplimentary = isEdit && editBillData?.isOfficial && ['cash', 'due', 'online'].includes(billData.billPayType);
+                                                    return (
                                                 <RadioGroup
                                                     className="radio_buttons text-base"
                                                     value={billData.billPayType}
                                                     onChange={(e) => {
-                                                        if (!(isEdit && buttonCLicked == 'Hotel')) {
-                                                            if (e.target.value == 'due') {
-                                                                // setOpenDue(true);
-                                                            } else {
-                                                                setBillData((perv) => ({
-                                                                    ...perv,
-                                                                    billPayType: e.target.value,
-                                                                }));
-                                                            }
+                                                        const next = e.target.value;
+                                                        if (lockComplimentaryAsOnly) return;
+                                                        if (next === 'complimentary' && disableComplimentary) return;
+                                                        if (next == 'due') {
+                                                            // Due opens modal via onClick; onChange does not set
+                                                        } else {
+                                                            setBillData((perv) => ({
+                                                                ...perv,
+                                                                billPayType: next,
+                                                            }));
                                                         }
                                                     }}
                                                 >
                                                     <div>
                                                         <FormControlLabel
                                                             value="cash"
+                                                            disabled={lockComplimentaryAsOnly}
                                                             control={
                                                                 <Radio
                                                                     name="radio"
@@ -3789,8 +3957,9 @@ const DineIn = () => {
                                                     <div>
                                                         <FormControlLabel
                                                             value="due"
+                                                            disabled={lockComplimentaryAsOnly}
                                                             onClick={() => {
-                                                                setOpenDue(true);
+                                                                if (!lockComplimentaryAsOnly) setOpenDue(true);
                                                             }}
                                                             control={
                                                                 <Radio
@@ -3809,7 +3978,8 @@ const DineIn = () => {
                                                     <div>
                                                         <FormControlLabel
                                                             value="online"
-                                                            onClick={(e) => handleClickO(e)}
+                                                            disabled={lockComplimentaryAsOnly}
+                                                            onClick={(e) => !lockComplimentaryAsOnly && handleClickO(e)}
                                                             control={
                                                                 <Radio
                                                                     name="radio"
@@ -3827,6 +3997,7 @@ const DineIn = () => {
                                                     <div>
                                                         <FormControlLabel
                                                             value="complimentary"
+                                                            disabled={disableComplimentary}
                                                             control={
                                                                 <Radio
                                                                     name="radio"
@@ -3842,6 +4013,8 @@ const DineIn = () => {
                                                         />
                                                     </div>
                                                 </RadioGroup>
+                                                    );
+                                                })()
                                             }
                                         </div>
                                         <div>
@@ -4050,13 +4223,14 @@ const DineIn = () => {
                                     <div>
                                         <button
                                             className="text-base button px-2 py-1 rounded-md text-white"
-                                            onClick={() =>
+                                            onClick={() => {
+                                                if (isSavingRef.current) return;
                                                 (status.toLocaleLowerCase() == 'print' || status.toLocaleLowerCase() == 'complete') ?
                                                     justsaveBillAtprint()
                                                     : isEdit
                                                         ? justEditBill()
-                                                        : justSaveBill()
-                                            }
+                                                        : justSaveBill();
+                                            }}
                                         >
                                             Save
                                         </button>
@@ -4065,6 +4239,7 @@ const DineIn = () => {
                                         <button
                                             className="text-base button save_button py-1 rounded-md text-white"
                                             onClick={() => {
+                                                if (isSavingRef.current) return;
                                                 (status.toLocaleLowerCase() == 'print' || status.toLocaleLowerCase() == 'complete') ?
                                                     saveBillAtprint()
                                                     : isEdit
@@ -4080,9 +4255,10 @@ const DineIn = () => {
                                         <div>
                                             <button
                                                 className="text-base button px-2 py-1 rounded-md text-white"
-                                                onClick={() =>
-                                                    settelBill()
-                                                }
+                                                onClick={() => {
+                                                    if (isSavingRef.current) return;
+                                                    settelBill();
+                                                }}
                                             >
                                                 Save & settle
                                             </button>
@@ -4093,6 +4269,7 @@ const DineIn = () => {
                                             <button
                                                 className="text-base button save_button py-1 rounded-md text-white"
                                                 onClick={() => {
+                                                    if (isSavingRef.current) return;
                                                     printBill();
                                                 }}
                                             >

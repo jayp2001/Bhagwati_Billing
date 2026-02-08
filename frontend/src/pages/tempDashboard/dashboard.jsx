@@ -8,7 +8,6 @@ import axios from 'axios';
 import { MdOutlineCurrencyExchange } from "react-icons/md";
 import React from 'react';
 import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlined';
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import TimerMinutes from './timer';
 import InputAdornment from "@mui/material/InputAdornment";
@@ -30,6 +29,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { pad } from 'crypto-js';
 import { TbBorderRadius } from 'react-icons/tb';
 import DineInBill from '../dineInBill';
+import RestaurantBill from '../RestaurantBill';
 // Use the exposed ipcRenderer from preload script
 const ipcRenderer = window.ipcRenderer;
 const style = {
@@ -38,7 +38,7 @@ const style = {
     outline: 'none',
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 550,
+    width: 750,
     bgcolor: "background.paper",
     boxShadow: 24,
     borderRadius: '10px',
@@ -63,7 +63,7 @@ function Dashboard() {
     const regexMobile = /^[0-9\b]+$/;
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     const [upiId, setUpiId] = useState();
-    const [billTypeCategory, setBillTypeCategory] = useState([]);
+    const [billTypeCategory, setBillTypeCategory] = useState({});
     const [upiList, setUpiList] = useState([])
     const [accountList, setAccountList] = useState([]);
     const [openDue, setOpenDue] = React.useState(false);
@@ -119,7 +119,8 @@ function Dashboard() {
             discountValue: '',
             totalDiscount: '',
             settledAmount: '',
-            billStatus: 'complete'
+            billStatus: 'complete',
+            tableStatus: ''
         }
     );
     const handleClose = () => {
@@ -132,7 +133,8 @@ function Dashboard() {
             discountValue: '',
             totalDiscount: '',
             settledAmount: '',
-            billStatus: 'complete'
+            billStatus: 'complete',
+            tableStatus: ''
         })
     };
 
@@ -180,6 +182,8 @@ function Dashboard() {
             const upiJson = upiList?.find((u) => u.onlineId === (resData?.onlineId || upiId));
 
             // Set bill data with the response data and always include upi/account info
+            // subTotal must be original total (totalAmount) for discount calc - not the discounted settledAmount
+            const originalTotal = resData?.totalAmount ?? resData?.subTotal ?? data.billAmt;
             setBillData({
                 billId: data.billId,
                 tableNo: data.tableNo,
@@ -190,7 +194,10 @@ function Dashboard() {
                 discountValue: 0,
                 totalDiscount: 0,
                 billStatus: 'complete',
+                tableStatus: data.tableStatus || '',
                 ...resData,
+                subTotal: originalTotal,
+                settledAmount: resData?.settledAmount ?? data.billAmt,
                 upiJson: upiJson,
                 onlineId: resData?.onlineId || upiId,
                 accountId: resData?.payInfo?.accountId || dueFormData.accountId,
@@ -199,7 +206,7 @@ function Dashboard() {
             setOpen(true);
         } catch (error) {
             console.error('Error fetching bill data:', error);
-            // Fallback to original behavior if API fails
+            // Fallback to original behavior if API fails (use billAmt for both)
             setBillData({
                 billId: data.billId,
                 tableNo: data.tableNo,
@@ -210,6 +217,7 @@ function Dashboard() {
                 discountValue: 0,
                 totalDiscount: 0,
                 billStatus: 'complete',
+                tableStatus: data.tableStatus || '',
                 upiJson: upiList?.find((u) => u.onlineId === upiId),
                 onlineId: upiId,
                 accountId: dueFormData.accountId,
@@ -327,7 +335,21 @@ function Dashboard() {
             .catch((error) => {
                 setError(error.response ? error.response.data : "Network Error ...!!!");
             });
-    }
+    };
+    const getBillCategory = async () => {
+        await axios
+            .get(`${BACKEND_BASE_URL}billingrouter/getBillCategory`, config)
+            .then((res) => {
+                if (res.data && typeof res.data === 'object') {
+                    setBillTypeCategory(res.data);
+                } else {
+                    setBillTypeCategory({});
+                }
+            })
+            .catch((error) => {
+                setError(error.response ? error.response.data : "Network Error ...!!!");
+            });
+    };
     const settelBill = () => {
         if (loading || success) {
         } else {
@@ -355,7 +377,7 @@ function Dashboard() {
     const handleCloseO = () => {
         setAnchorElO(null);
     };
-    const settelBillDataAtPrint = async () => {
+    const settelBillDataAtPrint = async (shouldPrint = false) => {
         setLoading(true);
         const upiJson = upiList?.filter((data) => data.onlineId == upiId)[0];
         const customData = {
@@ -382,7 +404,18 @@ function Dashboard() {
                 customData,
                 config
             )
-            .then((res) => {
+            .then(async (res) => {
+                if (shouldPrint && res?.data && dineinbill?.[0]) {
+                    try {
+                        const BillComponent = res.data.isOfficial ? RestaurantBill : DineInBill;
+                        const pickupKotPrint = renderToString(<BillComponent data={res.data} />);
+                        const printerDataKot = {
+                            printer: dineinbill[0],
+                            data: pickupKotPrint,
+                        };
+                        ipcRenderer.send("set-title", printerDataKot);
+                    } catch (rrr) { /* print fail */ }
+                }
                 setSuccess(true);
                 setLoading(false);
                 getTableList();
@@ -395,10 +428,133 @@ function Dashboard() {
                     discountValue: '',
                     totalDiscount: '',
                     settledAmount: '',
-                    billStatus: 'complete'
-                })
+                    billStatus: 'complete',
+                    tableStatus: ''
+                });
             })
             .catch((error) => {
+                setLoading(false);
+                setError(
+                    error.response && error.response.data
+                        ? error.response.data
+                        : "Network Error ...!!!"
+                );
+            });
+    };
+    const settleAndPrint = () => {
+        if (loading || success) return;
+        if (
+            !billData ||
+            !billData.subTotal ||
+            !billData.tableNo ||
+            !billData.billId ||
+            !billData.settledAmount ||
+            !billData.discountType ||
+            (billData.discountType != "none" && !billData.discountValue)
+        ) {
+            setError("Please Fill All Field");
+            return;
+        }
+        if (billData.settledAmount <= 0) {
+            setError("Sattle Amount can not be less than zero");
+            return;
+        }
+        settelBillDataAtPrint(true);
+    };
+    const saveAndSettle = () => {
+        if (loading || success) return;
+        if (
+            !billData ||
+            !billData.subTotal ||
+            !billData.tableNo ||
+            !billData.billId ||
+            !billData.settledAmount ||
+            !billData.discountType ||
+            (billData.discountType != "none" && !billData.discountValue)
+        ) {
+            setError("Please Fill All Field");
+            return;
+        }
+        if (billData.settledAmount <= 0) {
+            setError("Sattle Amount can not be less than zero");
+            return;
+        }
+        settelBillDataAtPrint(false);
+    };
+    const saveAndPrint = async () => {
+        if (loading || success) return;
+        if (
+            !billData ||
+            !billData.subTotal ||
+            !billData.tableNo ||
+            !billData.billId ||
+            !billData.settledAmount ||
+            !billData.discountType ||
+            (billData.discountType != "none" && !billData.discountValue)
+        ) {
+            setError("Please Fill All Field");
+            return;
+        }
+        if (billData.settledAmount <= 0) {
+            setError("Sattle Amount can not be less than zero");
+            return;
+        }
+        setLoading(true);
+        const upiJson = upiList?.filter((data) => data.onlineId == upiId)[0];
+        const customData = {
+            billId: billData.billId,
+            tableNo: billData.tableNo,
+            billPayType: billData.billPayType,
+            discountType: billData.discountType,
+            discountValue: billData.discountValue,
+            totalDiscount:
+                billData.discountType == "none"
+                    ? 0
+                    : billData.subTotal - billData.settledAmount,
+            settledAmount: billData.settledAmount,
+            accountId: dueFormData.accountId || '',
+            dueNote: dueFormData.dueNote || '',
+            isOfficial: billTypeCategory['Dine In']?.isOfficial ? true : billData.billPayType == 'online' ? upiJson?.isOfficial ? true : upiId == 'other' ? true : false : false,
+            upiJson: upiJson,
+            onlineId: upiId,
+            billStatus: 'print'
+        };
+        await axios
+            .post(
+                `${BACKEND_BASE_URL}billingrouter/updateBillDataWithPrintByID`,
+                customData,
+                config
+            )
+            .then(async (res) => {
+                if (res?.data && dineinbill?.[0]) {
+                    try {
+                        const BillComponent = res?.data?.isOfficial ? RestaurantBill : DineInBill;
+                        const pickupKotPrint = renderToString(<BillComponent data={res.data} />);
+                        const printerDataKot = {
+                            printer: dineinbill[0],
+                            data: pickupKotPrint,
+                        };
+                        ipcRenderer.send("set-title", printerDataKot);
+                    } catch (rrr) { /* print fail */ }
+                }
+                setSuccess(true);
+                setLoading(false);
+                getTableList();
+                setOpen(false);
+                setBillData({
+                    billId: '',
+                    tableNo: '',
+                    billPayType: '',
+                    discountType: '',
+                    discountValue: '',
+                    totalDiscount: '',
+                    settledAmount: '',
+                    billStatus: 'complete',
+                    tableStatus: ''
+                });
+            })
+            .catch((error) => {
+                setLoading(false);
                 setError(
                     error.response && error.response.data
                         ? error.response.data
@@ -417,20 +573,17 @@ function Dashboard() {
                 setSuccess(true);
                 setLoading(false);
                 getTableList();
-                try {
-                    const pickupKotPrint = renderToString(<DineInBill data={res.data} />);
-                    const printerDataKot = {
-                        printer: dineinbill[0],
-                        data: pickupKotPrint,
-                    };
-                    ipcRenderer.send("set-title", printerDataKot);
-                } catch (rrr) {
+                if (res?.data && dineinbill?.[0]) {
+                    try {
+                        const BillComponent = res.data.isOfficial ? RestaurantBill : DineInBill;
+                        const pickupKotPrint = renderToString(<BillComponent data={res.data} />);
+                        const printerDataKot = {
+                            printer: dineinbill[0],
+                            data: pickupKotPrint,
+                        };
+                        ipcRenderer.send("set-title", printerDataKot);
+                    } catch (rrr) { /* print fail */ }
                 }
-                // setTimeout(() => {
-                // setTimeout(() => {
-                //     navigate(`/main/DineIn/${table}/${billId}/print`);
-                // }, 1500);
-                // }, 1500)
             })
             .catch((error) => {
                 setError(
@@ -510,7 +663,8 @@ function Dashboard() {
     useEffect(() => {
         getTableList();
         getUpiDDl();
-        getAccountList()
+        getAccountList();
+        getBillCategory();
     }, [])
     return (
         <div>
@@ -622,25 +776,17 @@ function Dashboard() {
                                     <div className='printWrap flex justify-around'>
                                         {data.tableStatus == 'running' ?
                                             <>
-                                                <div className='print' onClick={() => {
-                                                    printBill(data.billId)
-                                                }}>
+                                                <div className='print' onClick={(e) => { e.stopPropagation(); printBill(data.billId); }}>
                                                     <LocalPrintshopOutlinedIcon />
                                                 </div>
-                                                <div className='print' onClick={() =>
-                                                    navigate(`/main/DineIn/${data.tableId ? data.tableId : null}/${data.billId ? data.billId : null}/${data.tableStatus ? data.tableStatus : null}`)
-                                                }>
-                                                    <VisibilityOutlinedIcon />
+                                                <div className='print' onClick={(e) => { e.stopPropagation(); handleSettel(data); }}>
+                                                    <SaveOutlinedIcon />
                                                 </div>
                                             </> :
                                             data.tableStatus == "CancelToken" ?
-                                                <div className='print' onClick={() => {
-                                                    handleCancel(data.billId)
-                                                }}>
+                                                <div className='print' onClick={(e) => { e.stopPropagation(); handleCancel(data.billId); }}>
                                                     <ClearIcon />
-                                                </div> : <div className='print' onClick={() => {
-                                                    handleSettel(data)
-                                                }}>
+                                                </div> : <div className='print' onClick={(e) => { e.stopPropagation(); handleSettel(data); }}>
                                                     <SaveOutlinedIcon />
                                                 </div>
                                         }
@@ -677,72 +823,82 @@ function Dashboard() {
                                     <div className="w-full font-semibold">Payment Type</div>
                                     <div className="flex w-full justify-between gap-4 main_div mt-3">
                                         <div>
-                                            <RadioGroup
-                                                className="radio_buttons text-base gap-6"
-                                                value={billData.billPayType}
-                                                onChange={(e) => {
-                                                    if (e.target.value == 'due') {
-                                                        // setOpenDue(true);
-                                                    } else {
-                                                        setBillData((perv) => ({
-                                                            ...perv,
-                                                            billPayType: e.target.value,
-                                                        }));
-                                                    }
-                                                }}
-                                            >
-                                                <div>
-                                                    <FormControlLabel
-                                                        value="cash"
-                                                        control={
-                                                            <Radio
-                                                                name="radio"
-                                                            />
-                                                        }
-                                                        label="Cash"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <FormControlLabel
-                                                        value="due"
-                                                        onClick={() => {
-                                                            setOpenDue(true);
+                                            {(() => {
+                                                const lockComplimentaryAsOnly = billData.isOfficial && billData.billPayType === 'complimentary';
+                                                const disableComplimentary = billData.isOfficial && ['cash', 'due', 'online'].includes(billData.billPayType);
+                                                return (
+                                                    <RadioGroup
+                                                        className="radio_buttons text-base gap-6"
+                                                        value={billData.billPayType}
+                                                        onChange={(e) => {
+                                                            const next = e.target.value;
+                                                            if (lockComplimentaryAsOnly) return;
+                                                            if (next === 'complimentary' && disableComplimentary) return;
+                                                            if (next == 'due') {
+                                                                setOpenDue(true);
+                                                            } else {
+                                                                setBillData((perv) => ({
+                                                                    ...perv,
+                                                                    billPayType: next,
+                                                                }));
+                                                            }
                                                         }}
-                                                        control={
-                                                            <Radio
-                                                                name="radio"
-
+                                                    >
+                                                        <div>
+                                                            <FormControlLabel
+                                                                value="cash"
+                                                                disabled={lockComplimentaryAsOnly}
+                                                                control={
+                                                                    <Radio
+                                                                        name="radio"
+                                                                    />
+                                                                }
+                                                                label="Cash"
                                                             />
-                                                        }
-                                                        label="Due"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <FormControlLabel
-                                                        value="online"
-                                                        onClick={(e) => handleClickO(e)}
-                                                        control={
-                                                            <Radio
-                                                                name="radio"
-
+                                                        </div>
+                                                        <div>
+                                                            <FormControlLabel
+                                                                value="due"
+                                                                disabled={lockComplimentaryAsOnly}
+                                                                onClick={() => {
+                                                                    if (!lockComplimentaryAsOnly) setOpenDue(true);
+                                                                }}
+                                                                control={
+                                                                    <Radio
+                                                                        name="radio"
+                                                                    />
+                                                                }
+                                                                label="Due"
                                                             />
-                                                        }
-                                                        label="Online"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <FormControlLabel
-                                                        value="complimentary"
-                                                        control={
-                                                            <Radio
-                                                                name="radio"
-
+                                                        </div>
+                                                        <div>
+                                                            <FormControlLabel
+                                                                value="online"
+                                                                disabled={lockComplimentaryAsOnly}
+                                                                onClick={(e) => !lockComplimentaryAsOnly && handleClickO(e)}
+                                                                control={
+                                                                    <Radio
+                                                                        name="radio"
+                                                                    />
+                                                                }
+                                                                label="Online"
                                                             />
-                                                        }
-                                                        label="Complimentary"
-                                                    />
-                                                </div>
-                                            </RadioGroup>
+                                                        </div>
+                                                        <div>
+                                                            <FormControlLabel
+                                                                value="complimentary"
+                                                                disabled={disableComplimentary}
+                                                                control={
+                                                                    <Radio
+                                                                        name="radio"
+                                                                    />
+                                                                }
+                                                                label="Complimentary"
+                                                            />
+                                                        </div>
+                                                    </RadioGroup>
+                                                );
+                                            })()}
                                         </div>
                                     </div>
                                 </div>
@@ -921,23 +1077,67 @@ function Dashboard() {
                                 <div>
                                     <button
                                         className="another_2 button text-base px-2 py-1 rounded-md text-white"
-                                        onClick={() =>
-                                            handleClose()
-                                        }
+                                        onClick={() => handleClose()}
                                     >
                                         Cancel
                                     </button>
                                 </div>
-                                <div>
-                                    <button
-                                        className="text-base button px-2 py-1 rounded-md text-white"
-                                        onClick={() =>
-                                            settelBill()
-                                        }
-                                    >
-                                        Settle & Save
-                                    </button>
-                                </div>
+                                {billData.tableStatus === 'running' ? (
+                                    <>
+                                        <div>
+                                            <button
+                                                className="text-base button px-2 py-1 rounded-md text-white"
+                                                onClick={() => settleAndPrint()}
+                                            >
+                                                Settle & Print
+                                            </button>
+                                        </div>
+                                        <div>
+                                            <button
+                                                className="text-base button px-2 py-1 rounded-md text-white"
+                                                onClick={() => saveAndSettle()}
+                                            >
+                                                Save & Settle
+                                            </button>
+                                        </div>
+                                        <div>
+                                            <button
+                                                className="text-base button px-2 py-1 rounded-md text-white"
+                                                onClick={() => saveAndPrint()}
+                                            >
+                                                Save & Print
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : billData.tableStatus === 'print' ? (
+                                    <>
+                                        <div>
+                                            <button
+                                                className="text-base button px-2 py-1 rounded-md text-white"
+                                                onClick={() => saveAndSettle()}
+                                            >
+                                                Save & Settle
+                                            </button>
+                                        </div>
+                                        <div>
+                                            <button
+                                                className="text-base button px-2 py-1 rounded-md text-white"
+                                                onClick={() => settleAndPrint()}
+                                            >
+                                                Settle & Print
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div>
+                                        <button
+                                            className="text-base button px-2 py-1 rounded-md text-white"
+                                            onClick={() => settelBill()}
+                                        >
+                                            Settle & Save
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -973,7 +1173,7 @@ function Dashboard() {
                             >
                                 {
                                     upiList?.map((data) => (
-                                        <MenuItem key={data.onlineId} value={data.onlineId}>{data.upiId}</MenuItem>
+                                        <MenuItem key={data.onlineId} value={data.onlineId}>{data.holderName}</MenuItem>
                                     ))
                                 }
                                 {

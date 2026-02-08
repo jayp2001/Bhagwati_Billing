@@ -1,7 +1,9 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState, useCallback, useRef } from "react";
+import AssignmentIcon from "@mui/icons-material/Assignment";
 import Header from "../../components/Header/Header";
 import Cards from "./Cards";
+import KOTCard from "./KOTCard";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import GridViewIcon from "@mui/icons-material/GridView";
@@ -11,8 +13,8 @@ import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import CachedIcon from "@mui/icons-material/Cached";
 import "./css/LiveView.css";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import RestaurantIcon from '@mui/icons-material/Restaurant';
-import ApartmentIcon from '@mui/icons-material/Apartment';
+import RestaurantIcon from "@mui/icons-material/Restaurant";
+import ApartmentIcon from "@mui/icons-material/Apartment";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { Divider } from "@mui/material";
@@ -32,7 +34,9 @@ const LiveView = () => {
   const [hasMore, setHasMore] = useState(true);
   const [searchInputValue, setSearchInputValue] = useState("");
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [activeView, setActiveView] = useState("order"); // "order" or "kot"
   const lastLoadTime = useRef(0);
+  const scrollContainerRef = useRef(null);
   const numPerPage = 20;
 
   useEffect(() => {
@@ -104,6 +108,19 @@ const LiveView = () => {
     getData(selectedTab, 1, searchTerm);
   }, [selectedTab]);
 
+  // Reset data when switching between Order and KOT view
+  useEffect(() => {
+    const tab = activeView === "kot" && selectedTab === "Dine In" ? "All" : selectedTab;
+    if (activeView === "kot" && selectedTab === "Dine In") {
+      setSelectedTab("All");
+    }
+    setPage(1);
+    setData([]);
+    setFilteredData([]);
+    setHasMore(true);
+    getData(tab, 1, searchTerm);
+  }, [activeView]);
+
   // Debounced search function
   const debouncedSearch = useCallback(
     (() => {
@@ -148,20 +165,21 @@ const LiveView = () => {
     }
   }, [hasMore, loading, isLoadingMore, page, selectedTab, searchTerm]);
 
-  // Auto-refresh data periodically to check for new live data
+  // Auto-refresh data every 5 seconds - only when user is at top and page is visible (LiveView is mounted)
   useEffect(() => {
     const refreshInterval = setInterval(() => {
-      // Only refresh if we're at the end and there's no search term
-      if (!hasMore && !searchTerm && !loading && !isLoadingMore) {
-        setHasMore(true); // Reset hasMore to allow checking for new data
-        const nextPage = page + 1;
-        setPage(nextPage);
-        getData(selectedTab, nextPage, searchTerm, true);
-      }
-    }, 30000); // Check every 30 seconds
+      if (document.visibilityState !== "visible") return;
+      const scrollTop = scrollContainerRef.current?.scrollTop ?? 0;
+      if (scrollTop > 100) return;
+      if (loading || searchTerm.trim() !== "") return;
+
+      setPage(1);
+      setHasMore(true);
+      getData(selectedTab, 1, searchTerm);
+    }, 5000);
 
     return () => clearInterval(refreshInterval);
-  }, [hasMore, searchTerm, loading, isLoadingMore, page, selectedTab]);
+  }, [selectedTab, searchTerm, loading]);
 
   // Container scroll handler for infinite scroll
   const handleScroll = useCallback((event) => {
@@ -191,18 +209,36 @@ const LiveView = () => {
       <div className="iconHeader">
         <div className="flex justify-between m-2 px-2 rounded-md border border-black items-center">
           <div className=" flex">
-            <div className="flex gap-2 p-4 py-6 text-sm items-center">
+            <div
+              className={`flex gap-2 p-4 py-6 text-sm items-center cursor-pointer transition-colors ${activeView === "order"
+                ? "border-b-2 border-red-600 text-red-600"
+                : "hover:bg-gray-50"
+                }`}
+              onClick={() => setActiveView("order")}
+            >
               <div className="topHeaderIconDiv">
-                <ShoppingCartIcon className="topHeaderIcon" />
+                <ShoppingCartIcon
+                  className="topHeaderIcon"
+                  style={{ color: activeView === "order" ? "#dc2626" : "", transition: "color 0.2s" }}
+                />
               </div>
-              <p>Order View</p>
+              <p className={`${activeView === "order" ? "font-semibold" : ""}`}>Order View</p>
             </div>
             <Divider orientation="vertical" flexItem />
-            <div className="flex gap-2 p-4 py-6 ml-2 text-sm items-center">
+            <div
+              className={`flex gap-2 p-4 py-6 ml-2 text-sm items-center cursor-pointer transition-colors ${activeView === "kot"
+                ? "border-b-2 border-red-600 text-red-600"
+                : "hover:bg-gray-50"
+                }`}
+              onClick={() => setActiveView("kot")}
+            >
               <div className="topHeaderIconDiv">
-                <ShoppingBagIcon className="topHeaderIcon" />
+                <AssignmentIcon
+                  className="topHeaderIcon"
+                  style={{ color: activeView === "kot" ? "#dc2626" : "", transition: "color 0.2s" }}
+                />
               </div>
-              <p>Kot View</p>
+              <p className={`${activeView === "kot" ? "font-semibold" : ""}`}>KOT View</p>
             </div>
           </div>
           <div className="p-1 flex items-center w-fit">
@@ -329,22 +365,24 @@ const LiveView = () => {
                   <p className="mt-1">Hotel</p>
                 </div>
               </div>
-              <div
-                className="tab cursor-pointer"
-                onClick={() => handleTabChange("Dine In")}
-              >
+              {activeView !== "kot" && (
                 <div
-                  className={`text-center w-fit px-8 border-b-4 ${selectedTab === "Dine In"
-                    ? "border-red-600"
-                    : "border-transparent"
-                    } rounded-sm`}
+                  className="tab cursor-pointer"
+                  onClick={() => handleTabChange("Dine In")}
                 >
-                  <div>
-                    <RestaurantMenuIcon />
+                  <div
+                    className={`text-center w-fit px-8 border-b-4 ${selectedTab === "Dine In"
+                      ? "border-red-600"
+                      : "border-transparent"
+                      } rounded-sm`}
+                  >
+                    <div>
+                      <RestaurantMenuIcon />
+                    </div>
+                    <p className="mt-1">Dine In</p>
                   </div>
-                  <p className="mt-1">Dine In</p>
                 </div>
-              </div>
+              )}
               {/* <div
                 className="tab cursor-pointer"
                 onClick={() => handleTabChange("Online")}
@@ -379,14 +417,23 @@ const LiveView = () => {
         </div>
       </div>
       <div
-        className="flex flex-wrap gap-x-5 gap-y-8 w-full fiedCardsHeight gapFor20Inch ml-3 px-2 py-6 pb-14"
+        ref={scrollContainerRef}
+        className={`flex flex-wrap w-full fiedCardsHeight ml-3 px-2 py-6 pb-14 ${activeView === "order" ? "gap-x-5 gap-y-8 gapFor20Inch" : "gap-4 justify-start"}`}
         onScroll={handleScroll}
-        style={{ overflowY: 'auto', height: 'calc(100vh - 200px)' }}
+        style={{ overflowY: "auto", height: "calc(100vh - 200px)" }}
       >
         {filteredData.length > 0 ? (
           filteredData.map((item, index) => (
-            <div key={`${item.id || index}-${index}`} className="my-2 minWidth">
-              <Cards data={item} />
+            <div
+              key={`${item.id || index}-${index}`}
+              className={activeView === "order" ? "my-2 minWidth" : "flex-shrink-0"}
+              style={activeView === "kot" ? { width: "320px" } : {}}
+            >
+              {activeView === "order" ? (
+                <Cards data={item} />
+              ) : (
+                <KOTCard data={item} />
+              )}
             </div>
           ))
         ) : !loading ? (

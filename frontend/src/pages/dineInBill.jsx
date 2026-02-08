@@ -41,8 +41,7 @@ const DineInBill = (props) => {
                     </div>}
                 <div
                     style={{
-                        paddingTop: "6px",
-                        paddingBottom: "0px",
+                        padding: "6px 4px 6px 4px",
                         borderBottom: "2px solid black",
                     }}
                 >
@@ -52,7 +51,7 @@ const DineInBill = (props) => {
                         SHRI BHAGAWATI
                         {/* {props.data.billPayType == 'cash'?'SHRI BHAGAWATI':props.data.firmData.firmName} */}
                         <br />
-                        {props.data.billType}
+                        <span style={{ display: "block", marginTop: "4px" }}>{props.data.billType}</span>
                     </div>
                 </div>
                 {props.data.billPayType === "complimentary" && (
@@ -225,6 +224,19 @@ const DineInBill = (props) => {
                         </div>
                     </div>
                 </div>
+                {props.data.billPayType == "due" && props.data.customerName && (
+                    <div
+                        style={{
+                            width: "257px",
+                            padding: "2px 4px",
+                            borderTop: "1px solid black",
+                            textAlign: "center",
+                            fontSize: "11px",
+                        }}
+                    >
+                        Due Account: <span style={{ fontWeight: "700" }}>{props.data.customerName}</span>
+                    </div>
+                )}
                 <div
                     className="main_bill h-min"
                     style={{ width: " 260px", height: "min-content" }}
@@ -458,7 +470,7 @@ const DineInBill = (props) => {
                                     </pre>
                                 </td>
                             </tr>
-                            {props.data.billComment && (
+                            {props.data.billComment != null && String(props.data.billComment).trim() !== "" && (
                                 <tr>
                                     <td colSpan="3" style={{ textAlign: "start" }}>
                                         {" "}

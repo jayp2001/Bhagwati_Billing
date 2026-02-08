@@ -296,10 +296,10 @@ const TableView = () => {
                                     {rows["hotel"] ? rows["hotel"].dueAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0}
                                 </TableCell>
                                 <TableCell align="right">
-                                    0.00
+                                    {rows["hotel"] ? rows["hotel"].onlineAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0}
                                 </TableCell>
                                 <TableCell align="right">
-                                    0.00
+                                    {rows["hotel"] ? rows["hotel"].complimentaryAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0}
                                 </TableCell>
                                 <TableCell align="right">
                                     {rows["hotel"] ? rows["hotel"].discountAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0}
@@ -366,13 +366,13 @@ const TableView = () => {
                                 </TableCell>
                                 <TableCell align="right" sx={{ fontWeight: 'bold', color: "green", fontSize: "18px" }}>
                                     {rows["pickUp"]
-                                        ? (rows["pickUp"].onlineAmt + rows["delivery"].onlineAmt + rows["dineIn"].onlineAmt).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                        ? (rows["pickUp"].onlineAmt + rows["delivery"].onlineAmt + rows["dineIn"].onlineAmt + rows["hotel"].onlineAmt).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                                         : 0}
                                 </TableCell>
                                 <TableCell align="right" sx={{ fontWeight: 'bold', color: "green", fontSize: "18px" }}>
                                     {rows["pickUp"]
                                         ? (rows["pickUp"].complimentaryAmt +
-                                            rows["delivery"].complimentaryAmt + rows["dineIn"].complimentaryAmt).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                            rows["delivery"].complimentaryAmt + rows["dineIn"].complimentaryAmt + rows["hotel"].complimentaryAmt).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                                         : 0}
                                 </TableCell>
                                 <TableCell align="right" sx={{ fontWeight: 'bold', color: "green", fontSize: "18px" }}>
