@@ -67,12 +67,11 @@ const RestaurantBill = (props) => {
               fontWeight: "500",
               fontSize: "12px",
               lineHeight: "20px",
-              marginBottom: "8px",
               paddingBottom: "4px",
             }}
           >
-            PHONE: {props.data.firmData.firmMobileNo} :{" "}
-            {props.data.firmData.otherMobileNo}
+            PHONE : {props?.data?.firmData?.firmMobileNo}
+            {props?.data?.firmData?.otherMobileNo ? ' : ' + props?.data?.firmData?.otherMobileNo : ''}
           </div>
         </div>
         <div
@@ -309,22 +308,6 @@ const RestaurantBill = (props) => {
             </div>
           </div>
         </div>
-        {props.data.billComment != null && String(props.data.billComment).trim() !== "" && (
-          <div
-            style={{
-              width: "257px",
-              height: "min-content",
-              borderTop: "1px solid black",
-              padding: "2px",
-            }}
-          >
-            <div style={{ textAlign: "start", width: "100%" }}>
-              <div style={{ textAlign: "start", fontSize: "12px" }}>
-                <div>Note: {props.data.billComment}</div>
-              </div>
-            </div>
-          </div>
-        )}
         {props.data.billPayType == "due" && props.data.customerName && (
           <div
             style={{
@@ -421,7 +404,7 @@ const RestaurantBill = (props) => {
                       width: "60%",
                       padding: "8px 4px 8px 4px",
                       textAlign: "start",
-                      fontSize: "13px",
+                      fontSize: "12px",
                     }}
                   >
                     {item.itemName} <br />
@@ -429,7 +412,7 @@ const RestaurantBill = (props) => {
                       <span
                         className="text-xs"
                         style={{
-                          fontSize: "14px",
+                          fontSize: "12px",
                           marginTop: "4px",
                           lineHeight: "27px",
                         }}
@@ -444,7 +427,7 @@ const RestaurantBill = (props) => {
                       borderCollapse: "collapse",
                       width: "20%",
                       textAlign: "center",
-                      fontSize: "13px",
+                      fontSize: "12px",
                     }}
                   >
                     {item.qty} {item.unit}
@@ -455,7 +438,7 @@ const RestaurantBill = (props) => {
                       borderCollapse: "collapse",
                       width: "20%",
                       textAlign: "center",
-                      fontSize: "13px",
+                      fontSize: "12px",
                     }}
                   >
                     {item.itemPrice.toFixed(2)}
@@ -472,7 +455,7 @@ const RestaurantBill = (props) => {
                       textAlign: "end",
                       paddingRight: "2px",
                       paddingLeft: "2px",
-                      fontSize: "13px",
+                      fontSize: "12px",
                     }}
                   >
                     {item.price.toFixed(2)}
@@ -570,6 +553,14 @@ const RestaurantBill = (props) => {
                   </pre>
                 </td>
               </tr>
+              {props.data.billComment != null && String(props.data.billComment).trim() !== "" && (
+                <tr>
+                  <td colSpan="3" style={{ textAlign: "start" }}>
+                    {" "}
+                    Note: {props.data.billComment}
+                  </td>
+                </tr>
+              )}
               {
                 props.data.upiJson && props.data.billPayType == "online" ? <>
                   <tr style={{ width: '100%' }}>
@@ -636,7 +627,7 @@ const RestaurantBill = (props) => {
                     padding: "4px 0px 4px 0px",
                   }}
                 >
-                  Thanks
+                  {props.data.appriciateLine ? props.data.appriciateLine : 'Thank You'}
                 </td>
               </tr>
             </tbody>

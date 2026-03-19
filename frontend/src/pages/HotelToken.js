@@ -61,12 +61,12 @@ const HotelToken = (props) => {
               fontWeight: "500",
               fontSize: "12px",
               lineHeight: "20px",
-              marginBottom: "8px",
+              marginBottom: "4px",
               paddingBottom: "4px",
             }}
           >
-            PHONE: {props.data.firmData.firmMobileNo} :{" "}
-            {props.data.firmData.otherMobileNo}
+            PHONE : {props?.data?.firmData?.firmMobileNo}
+            {props?.data?.firmData?.otherMobileNo ? ' : ' + props?.data?.firmData?.otherMobileNo : ''}
           </div>
         </div>
         {/* <div style={{ paddingBottom: "0px", borderBottom: "2px solid black" }}>
@@ -587,18 +587,6 @@ const HotelToken = (props) => {
                     </td>
                   </tr></> : <></>
               }
-              <tr>
-                <td colSpan="3">
-                  {" "}
-                  <hr
-                    style={{
-                      border: "1px dashed black",
-                      marginTop: "10px",
-                      marginBottom: "10px",
-                    }}
-                  />
-                </td>
-              </tr>
               {props.data.discountType != 'none' &&
                 < tr className="">
                   <td
@@ -644,6 +632,23 @@ const HotelToken = (props) => {
                   Grand Total Rs. {(parseFloat(props.data.settledAmount)).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
               </tr>
+              {props?.data?.footerBill &&
+                <tr>
+                  <td
+                    colSpan={6}
+                    style={{
+                      textAlign: "center",
+                      fontWeight: "400",
+                      borderTop: "1px solid black",
+                      padding: "4px 0px 4px 0px",
+                      fontSize: "12px",
+                      lineHeight: "20px"
+                    }}
+                  >
+                    {props.data.footerBill}
+                  </td>
+                </tr>
+              }
               <tr>
                 <td
                   colSpan="3"

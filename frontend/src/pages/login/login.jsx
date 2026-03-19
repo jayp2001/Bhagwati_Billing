@@ -169,6 +169,7 @@ function LoginPage() {
                     InputProps={{ style: { fontSize: 18 } }}
                     InputLabelProps={{ style: { fontSize: 18 } }}
                     fullWidth
+                    autoFocus
                   />
                   <FormControl sx={{ m: 1, width: "100%" }} variant="outlined">
                     <InputLabel htmlFor="outlined-adornment-password">

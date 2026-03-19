@@ -312,10 +312,12 @@ const PickUp = () => {
   };
 
   const handleInputCodeChange = (e) => {
-    const value = e.target.value;
+    // allow only a-z, A-Z, 0-9 and max 5 characters
+    const sanitized = e.target.value.replace(/[^a-zA-Z0-9]/g, "").slice(0, 5);
+
     setFullFormData((prevState) => ({
       ...prevState,
-      inputCode: value,
+      inputCode: sanitized,
     }));
     setDisabledFeild({ ...disbledFeild, quantity: false, comment: false });
     // const matchingProduct = data.find(item => item.itemCode.toString() === value);
@@ -5825,6 +5827,7 @@ const PickUp = () => {
               inputRef={first}
               className="textBoxmUI"
               error={validationError ? true : false}
+              inputProps={{ maxLength: 5 }}
             />
           </div>
           <div className="sm:w-96 w-96 autocompleteTxt">
@@ -6170,8 +6173,7 @@ const PickUp = () => {
                                           : ""
                                           }`}
                                       >
-                                        {val.mobileNo} - {val.customerName} -{" "}
-                                        {val.address}
+                                        {val?.mobileNo} {val?.customerName ? "- " + val?.customerName : ""} {val?.address ? "- " + val?.address : ""}
                                       </div>
                                     </div>
                                   ))}

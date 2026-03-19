@@ -254,10 +254,12 @@ const DineIn = () => {
     };
 
     const handleInputCodeChange = (e) => {
-        const value = e.target.value;
+        // allow only a-z, A-Z, 0-9 and max 5 characters
+        const sanitized = e.target.value.replace(/[^a-zA-Z0-9]/g, "").slice(0, 5);
+
         setFullFormData((prevState) => ({
             ...prevState,
-            inputCode: value,
+            inputCode: sanitized,
         }));
         setDisabledFeild({ ...disbledFeild, quantity: false, comment: false });
     };
@@ -3100,6 +3102,7 @@ const DineIn = () => {
                             inputRef={first}
                             className="textBoxmUI"
                             error={validationError ? true : false}
+                            inputProps={{ maxLength: 5 }}
                         />
                     </div>
                     <div className="sm:w-96 w-96 autocompleteTxt">
@@ -3459,8 +3462,7 @@ const DineIn = () => {
                                                                                                 : ""
                                                                                                 }`}
                                                                                         >
-                                                                                            {val.mobileNo} - {val.customerName} -{" "}
-                                                                                            {val.address}
+                                                                                            {val.mobileNo} {val.customerName ? "- " + val.customerName : ""} {val.address ? "- " + val.address : ""}
                                                                                         </div>
                                                                                     </div>
                                                                                 ))}
@@ -3919,100 +3921,100 @@ const DineIn = () => {
                                                     const lockComplimentaryAsOnly = isEdit && billData.billPayType === 'complimentary';
                                                     const disableComplimentary = isEdit && editBillData?.isOfficial && ['cash', 'due', 'online'].includes(billData.billPayType);
                                                     return (
-                                                <RadioGroup
-                                                    className="radio_buttons text-base"
-                                                    value={billData.billPayType}
-                                                    onChange={(e) => {
-                                                        const next = e.target.value;
-                                                        if (lockComplimentaryAsOnly) return;
-                                                        if (next === 'complimentary' && disableComplimentary) return;
-                                                        if (next == 'due') {
-                                                            // Due opens modal via onClick; onChange does not set
-                                                        } else {
-                                                            setBillData((perv) => ({
-                                                                ...perv,
-                                                                billPayType: next,
-                                                            }));
-                                                        }
-                                                    }}
-                                                >
-                                                    <div>
-                                                        <FormControlLabel
-                                                            value="cash"
-                                                            disabled={lockComplimentaryAsOnly}
-                                                            control={
-                                                                <Radio
-                                                                    name="radio"
-                                                                    sx={{
-                                                                        color: "#fff",
-                                                                        "&.Mui-checked": {
-                                                                            color: "#fff",
-                                                                        },
-                                                                    }}
-                                                                />
-                                                            }
-                                                            label="Cash"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <FormControlLabel
-                                                            value="due"
-                                                            disabled={lockComplimentaryAsOnly}
-                                                            onClick={() => {
-                                                                if (!lockComplimentaryAsOnly) setOpenDue(true);
+                                                        <RadioGroup
+                                                            className="radio_buttons text-base"
+                                                            value={billData.billPayType}
+                                                            onChange={(e) => {
+                                                                const next = e.target.value;
+                                                                if (lockComplimentaryAsOnly) return;
+                                                                if (next === 'complimentary' && disableComplimentary) return;
+                                                                if (next == 'due') {
+                                                                    // Due opens modal via onClick; onChange does not set
+                                                                } else {
+                                                                    setBillData((perv) => ({
+                                                                        ...perv,
+                                                                        billPayType: next,
+                                                                    }));
+                                                                }
                                                             }}
-                                                            control={
-                                                                <Radio
-                                                                    name="radio"
-                                                                    sx={{
-                                                                        color: "#fff",
-                                                                        "&.Mui-checked": {
-                                                                            color: "#fff",
-                                                                        },
-                                                                    }}
+                                                        >
+                                                            <div>
+                                                                <FormControlLabel
+                                                                    value="cash"
+                                                                    disabled={lockComplimentaryAsOnly}
+                                                                    control={
+                                                                        <Radio
+                                                                            name="radio"
+                                                                            sx={{
+                                                                                color: "#fff",
+                                                                                "&.Mui-checked": {
+                                                                                    color: "#fff",
+                                                                                },
+                                                                            }}
+                                                                        />
+                                                                    }
+                                                                    label="Cash"
                                                                 />
-                                                            }
-                                                            label="Due"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <FormControlLabel
-                                                            value="online"
-                                                            disabled={lockComplimentaryAsOnly}
-                                                            onClick={(e) => !lockComplimentaryAsOnly && handleClickO(e)}
-                                                            control={
-                                                                <Radio
-                                                                    name="radio"
-                                                                    sx={{
-                                                                        color: "#fff",
-                                                                        "&.Mui-checked": {
-                                                                            color: "#fff",
-                                                                        },
+                                                            </div>
+                                                            <div>
+                                                                <FormControlLabel
+                                                                    value="due"
+                                                                    disabled={lockComplimentaryAsOnly}
+                                                                    onClick={() => {
+                                                                        if (!lockComplimentaryAsOnly) setOpenDue(true);
                                                                     }}
+                                                                    control={
+                                                                        <Radio
+                                                                            name="radio"
+                                                                            sx={{
+                                                                                color: "#fff",
+                                                                                "&.Mui-checked": {
+                                                                                    color: "#fff",
+                                                                                },
+                                                                            }}
+                                                                        />
+                                                                    }
+                                                                    label="Due"
                                                                 />
-                                                            }
-                                                            label="Online"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <FormControlLabel
-                                                            value="complimentary"
-                                                            disabled={disableComplimentary}
-                                                            control={
-                                                                <Radio
-                                                                    name="radio"
-                                                                    sx={{
-                                                                        color: "#fff",
-                                                                        "&.Mui-checked": {
-                                                                            color: "#fff",
-                                                                        },
-                                                                    }}
+                                                            </div>
+                                                            <div>
+                                                                <FormControlLabel
+                                                                    value="online"
+                                                                    disabled={lockComplimentaryAsOnly}
+                                                                    onClick={(e) => !lockComplimentaryAsOnly && handleClickO(e)}
+                                                                    control={
+                                                                        <Radio
+                                                                            name="radio"
+                                                                            sx={{
+                                                                                color: "#fff",
+                                                                                "&.Mui-checked": {
+                                                                                    color: "#fff",
+                                                                                },
+                                                                            }}
+                                                                        />
+                                                                    }
+                                                                    label="Online"
                                                                 />
-                                                            }
-                                                            label="Complimentary"
-                                                        />
-                                                    </div>
-                                                </RadioGroup>
+                                                            </div>
+                                                            <div>
+                                                                <FormControlLabel
+                                                                    value="complimentary"
+                                                                    disabled={disableComplimentary}
+                                                                    control={
+                                                                        <Radio
+                                                                            name="radio"
+                                                                            sx={{
+                                                                                color: "#fff",
+                                                                                "&.Mui-checked": {
+                                                                                    color: "#fff",
+                                                                                },
+                                                                            }}
+                                                                        />
+                                                                    }
+                                                                    label="Complimentary"
+                                                                />
+                                                            </div>
+                                                        </RadioGroup>
                                                     );
                                                 })()
                                             }

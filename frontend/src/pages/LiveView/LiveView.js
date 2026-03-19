@@ -37,7 +37,7 @@ const LiveView = () => {
   const [activeView, setActiveView] = useState("order"); // "order" or "kot"
   const lastLoadTime = useRef(0);
   const scrollContainerRef = useRef(null);
-  const numPerPage = 20;
+  const numPerPage = 9;
 
   useEffect(() => {
     // Initial data load
@@ -439,9 +439,9 @@ const LiveView = () => {
         ) : !loading ? (
           <div className="w-full flex justify-center items-center">
             <div className="text-center">
-              <RestaurantIcon className="NoDataFoundIcon" /> <br />
+              <RestaurantIcon className="NoDataFoundIcon text-gray-500 text-9xl" /> <br />
               <p className="text-xl mt-1 text-gray-500">
-                No Data Found
+                No Bills Found
               </p>
             </div>
           </div>

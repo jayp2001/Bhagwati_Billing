@@ -9,3 +9,11 @@
 {
     background-color: rgb(220 38 38 / 1);
 }
+
+.button.btn-settle-print {
+    background-color: #16a34a; /* green */
+}
+
+.button.btn-save-print {
+    background-color: #f97316; /* orange */
+}

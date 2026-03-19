@@ -1,4 +1,4 @@
-.dashboardCard{
+.dashboardCard {
     height: 35px;
     width: 150px;
     /* border: 1px solid black; */
@@ -12,22 +12,23 @@
     background: red;
     color: white;
 }
-.addTableBtn{
+
+.addTableBtn {
     height: 40px;
-        width: 150px;
-        /* border: 1px solid black; */
-        border-radius: 5px;
-        text-align: center;
-        font-size: 16px;
-        padding-top: 8px;
-        cursor: pointer;
-        font-weight: bold;
-        /* background-color: rgb(220 38 38 / 1); */
-        background: red;
-        color: white;
+    width: 150px;
+    /* border: 1px solid black; */
+    border-radius: 5px;
+    text-align: center;
+    font-size: 16px;
+    padding-top: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    /* background-color: rgb(220 38 38 / 1); */
+    background: red;
+    color: white;
 }
 
-.tableIcon{
+.tableIcon {
     /* background: #ebebeb; */
     cursor: pointer;
     background: rgba(0, 0, 0, 0.05);
@@ -40,7 +41,8 @@
     border-radius: 10px;
     border: dashed 1px rgba(0, 0, 0, 0.5);
 }
-.tableIconRunning{
+
+.tableIconRunning {
     /* background: #ebebeb; */
     cursor: pointer;
     background: #fff88b;
@@ -54,9 +56,10 @@
     border: dashed 1px rgba(0, 0, 0, 0.5);
 }
 
-.blankIcon{
+.blankIcon {
     height: 95px;
 }
+
 .tableIconPrint {
     /* background: #ebebeb; */
     cursor: pointer;
@@ -70,6 +73,7 @@
     border-radius: 10px;
     border: dashed 1px rgba(0, 0, 0, 0.5);
 }
+
 .tableIconCancelToken {
     /* background: #ebebeb; */
     cursor: pointer;
@@ -84,18 +88,18 @@
     border: dashed 1px rgba(0, 0, 0, 0.5);
 }
 
-.tableWrapper{
+.tableWrapper {
     flex-direction: row;
-        flex-wrap: wrap;
+    flex-wrap: wrap;
 }
 
-.printWrap{
+.printWrap {
     position: relative;
     top: -15px;
     width: 95px;
 }
 
-.print{
+.print {
     width: 30px;
     cursor: pointer;
     height: 30px;
@@ -106,29 +110,33 @@
     border: 1px solid black;
 }
 
-.blankColor{
+.blankColor {
     height: 20px;
     border-radius: 50%;
     width: 20px;
     background-color: rgba(0, 0, 0, 0.3);
 }
-.runningColor{
+
+.runningColor {
     height: 20px;
-        border-radius: 50%;
-        width: 20px;
+    border-radius: 50%;
+    width: 20px;
     background: #ffcd06;
 }
+
 .cancelColor {
     height: 20px;
     border-radius: 50%;
     width: 20px;
     background: #f98484;
 }
+
 .printedColor {
     height: 20px;
-        border-radius: 50%;
-        width: 20px;
-    background: #77cb60;;
+    border-radius: 50%;
+    width: 20px;
+    background: #77cb60;
+    ;
 }
 
 .btn {
@@ -148,8 +156,8 @@
     color: white;
 }
 
-.dashboardCard:hover{
-    transform :scale(1.011);
+.dashboardCard:hover {
+    transform: scale(1.011);
     box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.5);
 }
 
@@ -169,6 +177,17 @@
     color: black;
     border: 1px solid black;
 }
-.button:hover{
+
+.btn-settle-print {
+    background: #16a34a;
+    /* green */
+}
+
+.btn-save-print {
+    background: #f97316;
+    /* orange */
+}
+
+.button:hover {
     transform: scale(1.011);
 }

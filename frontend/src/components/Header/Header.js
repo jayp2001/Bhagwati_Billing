@@ -11,6 +11,7 @@ import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import GridViewIcon from "@mui/icons-material/GridView";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleSwitch } from "../../pages/app/toggleSlice";
 import CloseIcon from "@mui/icons-material/Close";
@@ -896,11 +897,6 @@ const Header = (props) => {
             </div> */}
           </div>
           <div className="flex h-full align-middle gap-6 mr-3">
-            {(userInfo?.userName || userInfo?.name) && (
-              <div className="flex items-center text-sm font-bold text-gray-700 max-w-[120px] truncate" title={userInfo.userName || userInfo.name}>
-                {userInfo.userName || userInfo.name}
-              </div>
-            )}
             <Tooltip
               title={adminPcId === macAddress ? "This PC is main PC" : "Click to make this PC main"}
               placement="bottom"
@@ -979,9 +975,16 @@ const Header = (props) => {
         >
           <Box sx={style} className="p-2 rounded-md">
             {(userInfo?.userName || userInfo?.name) && (
-              <p className="mb-2 text-sm text-gray-600">Logged in as: <span className="font-semibold text-gray-800">{userInfo.userName || userInfo.name}</span></p>
+              <div className="mb-2 text-center">
+                <AccountCircleIcon sx={{ fontSize: 80, color: "#4b5563" }} />
+                <p className="mt-1 text-sm text-gray-600">
+                  <span className="font-semibold text-gray-800 font-bold text-xl">
+                    {userInfo.userName || userInfo.name}
+                  </span>
+                </p>
+              </div>
             )}
-            <p>Are You Sure you Want To LogOut?</p>
+            <p className="text-center">Are You Sure You Want To LogOut ?</p>
             <div className="w-full text-base flex  gap-4 p-1 mt-4 ">
               <div className="w-full">
                 <button

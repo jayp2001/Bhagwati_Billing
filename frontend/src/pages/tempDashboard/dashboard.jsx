@@ -1086,25 +1086,28 @@ function Dashboard() {
                                     <>
                                         <div>
                                             <button
-                                                className="text-base button px-2 py-1 rounded-md text-white"
+                                                className="text-base button btn-settle-print px-2 py-1 rounded-md text-white flex items-center gap-1"
                                                 onClick={() => settleAndPrint()}
                                             >
+                                                <LocalPrintshopOutlinedIcon fontSize="small" />
                                                 Settle & Print
                                             </button>
                                         </div>
                                         <div>
                                             <button
-                                                className="text-base button px-2 py-1 rounded-md text-white"
+                                                className="text-base button px-2 py-1 rounded-md text-white flex items-center gap-1"
                                                 onClick={() => saveAndSettle()}
                                             >
+                                                <SaveOutlinedIcon fontSize="small" />
                                                 Save & Settle
                                             </button>
                                         </div>
                                         <div>
                                             <button
-                                                className="text-base button px-2 py-1 rounded-md text-white"
+                                                className="text-base button btn-save-print px-2 py-1 rounded-md text-white flex items-center gap-1"
                                                 onClick={() => saveAndPrint()}
                                             >
+                                                <SaveOutlinedIcon fontSize="small" />
                                                 Save & Print
                                             </button>
                                         </div>
@@ -1113,18 +1116,20 @@ function Dashboard() {
                                     <>
                                         <div>
                                             <button
-                                                className="text-base button px-2 py-1 rounded-md text-white"
-                                                onClick={() => saveAndSettle()}
+                                                className="text-base button btn-settle-print px-2 py-1 rounded-md text-white flex items-center gap-1"
+                                                onClick={() => settleAndPrint()}
                                             >
-                                                Save & Settle
+                                                <LocalPrintshopOutlinedIcon fontSize="small" />
+                                                Settle & Print
                                             </button>
                                         </div>
                                         <div>
                                             <button
-                                                className="text-base button px-2 py-1 rounded-md text-white"
-                                                onClick={() => settleAndPrint()}
+                                                className="text-base button px-2 py-1 rounded-md text-white flex items-center gap-1"
+                                                onClick={() => saveAndSettle()}
                                             >
-                                                Settle & Print
+                                                <SaveOutlinedIcon fontSize="small" />
+                                                Save & Settle
                                             </button>
                                         </div>
                                     </>
