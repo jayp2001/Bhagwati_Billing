@@ -153,6 +153,18 @@ const HotelToken = (props) => {
                   </div>
                 </div>
               )}
+              {props?.data?.cashier && props?.data?.cashier != null && props?.data?.cashier != '' && <div
+                className="text-start upper_right"
+                style={{
+                  textAlign: "start",
+                  maxWidth: "100%",
+                  fontSize: "10px",
+                }}
+              >
+                <div style={{ marginTop: "6px", fontSize: "12px", paddingRight: "5px" }}>
+                  Cashier : {props.data.cashier}
+                </div>
+              </div>}
             </div>
           </div>
         )}

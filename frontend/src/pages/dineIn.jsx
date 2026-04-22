@@ -671,6 +671,9 @@ const DineIn = () => {
         loading,
         success,
         status,
+        upiId,
+        upiList,
+        setUpiId,
     ]);
     const handleInputNameChange = async (e, value) => {
         // const filtered = value ? data.filter(item =>
@@ -1408,7 +1411,7 @@ const DineIn = () => {
                     billCommentAuto: [],
                 });
                 try {
-                    const pickupKotPrint = renderToString(<DineInBill data={res.data} />);
+                    const pickupKotPrint = renderToString(res.data.isOfficial ? <RestaurantBill data={res.data} /> : <DineInBill data={res.data} />);
                     const printerDataKot = {
                         printer: dineinbill[0],
                         data: pickupKotPrint,
@@ -3925,6 +3928,9 @@ const DineIn = () => {
                                                             className="radio_buttons text-base"
                                                             value={billData.billPayType}
                                                             onChange={(e) => {
+                                                                if (!upiId && e.target.value == 'online') {
+                                                                    setUpiId(upiList[0]?.onlineId);
+                                                                }
                                                                 const next = e.target.value;
                                                                 if (lockComplimentaryAsOnly) return;
                                                                 if (next === 'complimentary' && disableComplimentary) return;
@@ -4405,7 +4411,7 @@ const DineIn = () => {
                             >
                                 {
                                     upiList?.map((data) => (
-                                        <MenuItem key={data.onlineId} value={data.onlineId}>{data.upiId}</MenuItem>
+                                        <MenuItem key={data.onlineId} value={data.onlineId}>{data.holderName}</MenuItem>
                                     ))
                                 }
                                 {

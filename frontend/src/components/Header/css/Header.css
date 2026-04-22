@@ -57,6 +57,45 @@ body {
     border-bottom: 1px solid rgba(0, 0, 0, 0.7);
 }
 
+/* Recent drawer: align header columns with row data (icon + token | info | Rs.) */
+.recentBillGrid {
+    display: grid;
+    grid-template-columns: 24px auto minmax(0, 1fr) 7rem;
+    column-gap: 0.25rem;
+    align-items: center;
+    padding-left: 0.5rem;
+    padding-right: 0.25rem;
+}
+
+/* Token column: size to content so the middle column sits closer (was 1fr + 2fr leaving a wide gap). */
+.recentBillGrid > *:nth-child(2) {
+    max-width: 13rem;
+    min-width: 0;
+}
+
+.recentBillGrid .customername {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+}
+
+/* Rs. column: header + amounts share the same right alignment and inset */
+.recentBillGrid .recentBillRsCol {
+    justify-self: stretch;
+    width: 100%;
+    min-width: 0;
+    text-align: right;
+    padding-right: 0.15rem;
+    box-sizing: border-box;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Online recent orders drawer — tighter column header */
+.onlineRecentBillHeader {
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.55);
+}
+
 .HoldBillsIcons {
     color: gray !important;
     font-size: 20px !important;

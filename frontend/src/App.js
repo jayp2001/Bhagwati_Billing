@@ -12,6 +12,7 @@ import HotelBill from "./pages/HotelBill";
 import RestaurantBill from "./pages/RestaurantBill";
 import KOT from "./pages/KOT";
 import TokenBill from "./pages/TokenBill";
+import HotelToken from "./pages/HotelToken";
 // import Test from './pages/Test';
 import PrintSlectingPage from "./pages/PrintSelectingPage";
 import LoginPage from "./pages/login/login";
@@ -78,18 +79,56 @@ const getKotPrinter = (data) => {
   }
 };
 
-const getPrintData = (data) => {
+const resolvePrintStatus = (data, fallbackStatus = "bill") => {
+  const rawStatus = (
+    data?.status ||
+    data?.printStatus ||
+    data?.documentType ||
+    data?.printType ||
+    fallbackStatus
+  )
+    .toString()
+    .toLowerCase();
+
+  if (rawStatus.includes("kot")) {
+    return "kot";
+  }
+  return "bill";
+};
+
+const getPrintData = (data, fallbackStatus = "bill") => {
+  const status = resolvePrintStatus(data, fallbackStatus);
+
+  if (status === "kot") {
+    return getKotData(data);
+  }
+
   switch (data.billType) {
     case 'Pick Up':
-      return renderToString(<RestaurantBill data={data} />);
     case 'Delivery':
-      return renderToString(<RestaurantBill data={data} />);
+      return renderToString(
+        data?.isOfficial ? <RestaurantBill data={data} /> : <TokenBill data={data} />
+      );
     case 'Hotel':
-      return renderToString(<HotelBill data={data} isEdit={data.isEdit} />);
+      return renderToString(
+        data?.isOfficial ? (
+          <HotelBill data={data} isEdit={data.isEdit} />
+        ) : (
+          <HotelToken data={data} isEdit={data.isEdit} />
+        )
+      );
     case 'Dine In':
-      return renderToString(<DineInBill data={data} isEdit={data.isEdit} />);
+      return renderToString(
+        data?.isOfficial ? (
+          <RestaurantBill data={data} isEdit={data.isEdit} />
+        ) : (
+          <DineInBill data={data} isEdit={data.isEdit} />
+        )
+      );
     default:
-      return renderToString(<RestaurantBill data={data} />);
+      return renderToString(
+        data?.isOfficial ? <RestaurantBill data={data} /> : <TokenBill data={data} />
+      );
   }
 };
 
@@ -385,12 +424,13 @@ const App = () => {
     socket.on(`print_Bill_${macAddress}`, (message) => {
       console.log('message_BILL', message);
       try {
-        const printer = getPrinter(message);
+        const status = resolvePrintStatus(message, "bill");
+        const printer = status === "kot" ? getKotPrinter(message) : getPrinter(message);
         console.log('message', message);
         console.log('Selected bill printer', printer);
         const printBill = {
           printer,
-          data: getPrintData(message),
+          data: getPrintData(message, status),
         };
         setTimeout(() => {
           ipcRenderer.send('set-title', printBill);

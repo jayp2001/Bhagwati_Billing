@@ -4,8 +4,10 @@
 // export const BACKEND_BASE_URL = "http://192.168.1.222:8000/api/";
 // export const BACKEND_BASE_URL = "http://106.201.146.151:8000/";
 // export const SOCKET_URL = "http://192.168.1.29:8000";
-export const SOCKET_URL = "http://localhost:8000";
-export const BACKEND_BASE_URL = "http://localhost:8000/api/";
+// export const SOCKET_URL = "http://192.168.1.36:8000";
+// export const BACKEND_BASE_URL = "http://192.168.1.36:8000/";
+export const SOCKET_URL = "http://192.168.1.222:8000";
+export const BACKEND_BASE_URL = "http://192.168.1.222:8000/";
 // export const BACKEND_BASE_URL = "http://192.168.1.59:8000/";
 // export const BACKEND_BASE_URL = "http://192.168.1.29:8000/";";
 // export const BACKEND_BASE_URL = "http://110.226.126.37:8000/api/";

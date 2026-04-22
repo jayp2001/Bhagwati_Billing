@@ -516,6 +516,7 @@ const PickUp = () => {
               : saveBill();
       }
       if (event.key === "F9") {
+        console.log("F9 clicked", upiId);
         // F9: Same as F12 but with isOfficial: true
         buttonCLicked == "Hotel"
           ? isEdit
@@ -691,6 +692,9 @@ const PickUp = () => {
     billError,
     hotelFormData,
     items,
+    upiId,
+    upiList,
+    setUpiId,
     // tab,
   ]);
   const handleInputNameChange = async (e, value) => {
@@ -964,7 +968,7 @@ const PickUp = () => {
       ...billData,
       accountId: dueFormData.accountId,
       dueNote: dueFormData.dueNote,
-      customerName: dueFormData.selectedAccount?.customerName || '',
+      customerName: dueFormData.selectedAccount?.customerName || customerData.customerName || '',
       billType: "Hotel",
       printBill: true,
       printKot: true,
@@ -1292,7 +1296,7 @@ const PickUp = () => {
       ...billData,
       accountId: dueFormData.accountId,
       dueNote: dueFormData.dueNote,
-      customerName: dueFormData.selectedAccount?.customerName || '',
+      customerName: dueFormData.selectedAccount?.customerName || customerData.customerName || '',
       billType: "Hotel",
       printBill: true,
       printKot: true,
@@ -1584,7 +1588,7 @@ const PickUp = () => {
       ...billData,
       accountId: dueFormData.accountId,
       dueNote: dueFormData.dueNote,
-      customerName: dueFormData.selectedAccount?.customerName || '',
+      customerName: dueFormData.selectedAccount?.customerName || customerData.customerName || '',
       billType: "Hotel",
       printBill: true,
       printKot: true,
@@ -1917,7 +1921,7 @@ const PickUp = () => {
       ...billData,
       accountId: dueFormData.accountId,
       dueNote: dueFormData.dueNote,
-      customerName: dueFormData.selectedAccount?.customerName || '',
+      customerName: dueFormData.selectedAccount?.customerName || customerData.customerName || '',
       billType: "Hotel",
       printBill: true,
       printKot: true,
@@ -2247,7 +2251,7 @@ const PickUp = () => {
       ...billData,
       accountId: dueFormData.accountId,
       dueNote: dueFormData.dueNote,
-      customerName: dueFormData.selectedAccount?.customerName || '',
+      customerName: dueFormData.selectedAccount?.customerName || customerData.customerName || '',
       billType: "Hotel",
       printBill: true,
       printKot: true,
@@ -2436,6 +2440,7 @@ const PickUp = () => {
   };
 
   const editBillDataFunction = async () => {
+    console.log("onlineId=?????", upiId)
     setLoading(true);
     const upiJson = upiList?.filter((data) => data.onlineId == upiId)[0];
     const customData = {
@@ -2568,7 +2573,7 @@ const PickUp = () => {
       ...billData,
       accountId: dueFormData.accountId,
       dueNote: dueFormData.dueNote,
-      customerName: dueFormData.selectedAccount?.customerName || '',
+      customerName: dueFormData.selectedAccount?.customerName || customerData.customerName || '',
       billType: "Hotel",
       printBill: true,
       printKot: true,
@@ -2897,7 +2902,7 @@ const PickUp = () => {
       ...billData,
       accountId: dueFormData.accountId,
       dueNote: dueFormData.dueNote,
-      customerName: dueFormData.selectedAccount?.customerName || '',
+      customerName: dueFormData.selectedAccount?.customerName || customerData.customerName || '',
       billType: "Hotel",
       printBill: false,
       printKot: false,
@@ -3197,7 +3202,7 @@ const PickUp = () => {
       ...billData,
       accountId: dueFormData.accountId,
       dueNote: dueFormData.dueNote,
-      customerName: dueFormData.selectedAccount?.customerName || '',
+      customerName: dueFormData.selectedAccount?.customerName || customerData.customerName || '',
       billType: "Hotel",
       printBill: true,
       printKot: true,
@@ -3545,7 +3550,7 @@ const PickUp = () => {
       ...billData,
       accountId: dueFormData.accountId,
       dueNote: dueFormData.dueNote,
-      customerName: dueFormData.selectedAccount?.customerName || '',
+      customerName: dueFormData.selectedAccount?.customerName || customerData.customerName || '',
       billType: "Hotel",
       printBill: true,
       printKot: false,
@@ -3896,7 +3901,7 @@ const PickUp = () => {
       ...billData,
       accountId: dueFormData.accountId,
       dueNote: dueFormData.dueNote,
-      customerName: dueFormData.selectedAccount?.customerName || '',
+      customerName: dueFormData.selectedAccount?.customerName || customerData.customerName || '',
       billType: "Hotel",
       printBill: false,
       printKot: true,
@@ -6790,19 +6795,22 @@ const PickUp = () => {
                             className="radio_buttons text-base"
                             value={billData.billPayType}
                             onChange={(e) => {
-                              if (!(isEdit && buttonCLicked == 'Hotel')) {
-                                const next = e.target.value;
-                                if (lockComplimentaryAsOnly) return;
-                                if (next === 'complimentary' && disableComplimentary) return;
-                                if (next == 'due') {
-                                  // Due opens modal via onClick; onChange does not set
-                                } else {
-                                  setBillData((perv) => ({
-                                    ...perv,
-                                    billPayType: next,
-                                  }));
-                                }
+                              if (!upiId && e.target.value == 'online') {
+                                setUpiId(upiList[0]?.onlineId);
                               }
+                              // if (!(isEdit && buttonCLicked == 'Hotel')) {
+                              const next = e.target.value;
+                              if (lockComplimentaryAsOnly) return;
+                              if (next === 'complimentary' && disableComplimentary) return;
+                              if (next == 'due') {
+                                // Due opens modal via onClick; onChange does not set
+                              } else {
+                                setBillData((perv) => ({
+                                  ...perv,
+                                  billPayType: next,
+                                }));
+                              }
+                              // }
                             }}
                           >
                             <div>
